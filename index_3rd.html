@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CUDA Ecosystem - Interactive Grid</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000000;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #ffffff;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #76b900, #00b4d8, #0077b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(118, 185, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            color: #b0b0b0;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 10px;
+            max-width: 1200px;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .logo-card {
+            background: transparent;
+            backdrop-filter: none;
+            border: 1px solid transparent;
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            min-height: 140px;
+            box-shadow: none;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .logo-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(118, 185, 0, 0.1), transparent);
+            border-radius: 15px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .logo-card:hover::before {
+            opacity: 1;
+        }
+
+        .logo-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(118, 185, 0, 0.2);
+            border-color: rgba(118, 185, 0, 0.5);
+        }
+
+        .logo-icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            object-fit: contain;
+            filter: brightness(1);
+        }
+
+        .logo-icon-text {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #76b900;
+            transition: all 0.3s ease;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .logo-card:hover .logo-icon {
+            transform: scale(1.2);
+            filter: brightness(1.2);
+        }
+
+        .logo-card:hover .logo-icon-text {
+            transform: scale(1.2);
+            color: #00d4aa;
+        }
+
+        .logo-name {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .logo-description {
+            font-size: 0.8rem;
+            color: #b0b0b0;
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+
+        .logo-card:hover .logo-name {
+            color: #76b900;
+        }
+
+        .logo-card:hover .logo-description {
+            opacity: 1;
+            color: #ffffff;
+        }
+
+        /* Floating animation */
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        .logo-card {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        /* Stagger the animation for a wave effect */
+        .logo-card:nth-child(1) { animation-delay: 0s; }
+        .logo-card:nth-child(2) { animation-delay: 0.2s; }
+        .logo-card:nth-child(3) { animation-delay: 0.4s; }
+        .logo-card:nth-child(4) { animation-delay: 0.6s; }
+        .logo-card:nth-child(5) { animation-delay: 0.8s; }
+        .logo-card:nth-child(6) { animation-delay: 1s; }
+        .logo-card:nth-child(7) { animation-delay: 1.2s; }
+        .logo-card:nth-child(8) { animation-delay: 1.4s; }
+        .logo-card:nth-child(9) { animation-delay: 1.6s; }
+        .logo-card:nth-child(10) { animation-delay: 1.8s; }
+        .logo-card:nth-child(11) { animation-delay: 2s; }
+        .logo-card:nth-child(12) { animation-delay: 2.2s; }
+        .logo-card:nth-child(13) { animation-delay: 0.1s; }
+        .logo-card:nth-child(14) { animation-delay: 0.3s; }
+        .logo-card:nth-child(15) { animation-delay: 0.5s; }
+        .logo-card:nth-child(16) { animation-delay: 0.7s; }
+        .logo-card:nth-child(17) { animation-delay: 0.9s; }
+        .logo-card:nth-child(18) { animation-delay: 1.1s; }
+        .logo-card:nth-child(19) { animation-delay: 1.3s; }
+        .logo-card:nth-child(20) { animation-delay: 1.5s; }
+        .logo-card:nth-child(21) { animation-delay: 1.7s; }
+        .logo-card:nth-child(22) { animation-delay: 1.9s; }
+        .logo-card:nth-child(23) { animation-delay: 2.1s; }
+        .logo-card:nth-child(24) { animation-delay: 2.3s; }
+
+        /* Responsive design */
+        @media (max-width: 1024px) {
+            .grid-container {
+                grid-template-columns: repeat(4, 1fr);
+                grid-template-rows: repeat(6, 1fr);
+            }
+            
+            .header h1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: repeat(3, 1fr);
+                grid-template-rows: repeat(8, 1fr);
+                gap: 12px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .logo-card {
+                min-height: 120px;
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .grid-container {
+                grid-template-columns: repeat(2, 1fr);
+                grid-template-rows: repeat(12, 1fr);
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+        }
+
+        .logo-card {
+            animation: float 4s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>CUDA Ecosystem</h1>
+        <p>Interactive Library Grid</p>
+    </div>
+
+    <div class="grid-container">
+        <!-- First row -->
+        <a href="https://docs.nvidia.com/cuda/cublas/" target="_blank" class="logo-card">
+            <img src="logos/cublas.png" alt="cuBLAS" class="logo-icon">
+            <div class="logo-name">cuBLAS</div>
+            <div class="logo-description">Linear Algebra Library</div>
+        </a>
+
+        <a href="https://docs.nvidia.com/cuda/cusparse/" target="_blank" class="logo-card">
+            <img src="logos/cusparse.png" alt="cuSPARSE" class="logo-icon">
+            <div class="logo-name">cuSPARSE</div>
+            <div class="logo-description">Sparse Matrix Operations</div>
+        </a>
+
+        <a href="https://docs.nvidia.com/deeplearning/cudnn/" target="_blank" class="logo-card">
+            <img src="logos/cudnn.png" alt="cuDNN" class="logo-icon">
+            <div class="logo-name">cuDNN</div>
+            <div class="logo-description">Deep Neural Networks</div>
+        </a>
+
+        <a href="https://docs.nvidia.com/deeplearning/tensorrt/" target="_blank" class="logo-card">
+            <img src="logos/tensorrt.png" alt="TensorRT" class="logo-icon">
+            <div class="logo-name">TensorRT</div>
+            <div class="logo-description">Inference Optimizer</div>
+        </a>
+
+        <a href="https://docs.nvidia.com/gpudirect-storage/" target="_blank" class="logo-card">
+            <div class="logo-icon-text">cuFILE</div>
+            <div class="logo-name">cuFILE (GDS)</div>
+            <div class="logo-description">GPU Direct Storage</div>
+        </a>
+
+        <a href="https://github.com/NVIDIA/nvbench" target="_blank" class="logo-card">
+            <img src="logos/nvbench.png" alt="NVBENCH" class="logo-icon">
+            <div class="logo-name">NVBENCH</div>
+            <div class="logo-description">GPU Benchmarking</div>
+        </a>
+
+        <!-- Second row -->
+        <a href="https://docs.nvidia.com/cuda/cufft/" target="_blank" class="logo-card">
+            <img src="logos/cufft.png" alt="cuFFT" class="logo-icon">
+            <div class="logo-name">cuFFT</div>
+            <div class="logo-description">Fast Fourier Transform</div>
+        </a>
+
+        <a href="https://docs.nvidia.com/cuda/cudss/" target="_blank" class="logo-card">
+            <img src="logos/cudss.png" alt="cuDSS" class="logo-icon">
+            <div class="logo-name">cuDSS</div>
+            <div class="logo-description">Direct Sparse Solver</div>
+        </a>
+
+        <a href="https://docs.opencv.org/4.x/d1/d1a/group__cuda.html" target="_blank" class="logo-card">
+            <div class="logo-icon-text">CV</div>
+            <div class="logo-name">CV CUDA</div>
+            <div class="logo-description">Computer Vision</div>
+        </a>
+
+        <a href="https://developer.nvidia.com/culitho" target="_blank" class="logo-card">
+            <div class="logo-icon-text">cuLitho</div>
+            <div class="logo-name">cuLitho</div>
+            <div class="logo-description">Computational Lithography</div>
+        </a>
+
+        <a href="https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#cooperative-groups" target="_blank" class="logo-card">
+            <div class="logo-icon-text">CG</div>
+            <div class="logo-name">Cooperative Groups</div>
+            <div class="logo-description">Thread Cooperation</div>
+        </a>
+
+        <a href="https://docs.nvidia.com/nvshmem/" target="_blank" class="logo-card">
+            <img src="logos/nvshmem.png" alt="NVSHMEM" class="logo-icon">
+            <div class="logo-name">NVSHMEM</div>
+            <div class="logo-description">Partitioned Global Memory</div>
+        </a>
+
+        <!-- Third row -->
+        <a href="https://docs.nvidia.com/cuda/curand/" target="_blank" class="logo-card">
+            <img src="logos/curand.png" alt="cuRAND" class="logo-icon">
+            <div class="logo-name">cuRAND</div>
+            <div class="logo-description">Random Number Generation</div>
+        </a>
+
+        <a href="https://docs.nvidia.com/cuda/cusolver/" target="_blank" class="logo-card">
+            <img src="logos/cusolver.png" alt="cuSOLVER" class="logo-icon">
+            <div class="logo-name">cuSOLVER</div>
+            <div class="logo-description">Linear Solvers</div>
+        </a>
+
+        <a href="https://rapids.ai/" target="_blank" class="logo-card">
+            <img src="logos/rapids.png" alt="RAPIDS" class="logo-icon">
+            <div class="logo-name">RAPIDS</div>
+            <div class="logo-description">Data Science Suite</div>
+        </a>
+
+        <a href="https://nvidia.github.io/cuda-quantum/" target="_blank" class="logo-card">
+            <div class="logo-icon-text">CUDA-Q</div>
+            <div class="logo-name">CUDA-Q</div>
+            <div class="logo-description">Quantum Computing</div>
+        </a>
+
+        <a href="https://github.com/NVIDIA/cutlass" target="_blank" class="logo-card">
+            <div class="logo-icon-text">CUTLASS</div>
+            <div class="logo-name">CUTLASS</div>
+            <div class="logo-description">GEMM Templates</div>
+        </a>
+
+        <a href="https://docs.nvidia.com/deeplearning/nccl/" target="_blank" class="logo-card">
+            <img src="logos/nccl.png" alt="NCCL" class="logo-icon">
+            <div class="logo-name">NCCL</div>
+            <div class="logo-description">Multi-GPU Communication</div>
+        </a>
+
+        <!-- Fourth row -->
+        <a href="https://docs.nvidia.com/cuda/cutensor/" target="_blank" class="logo-card">
+            <img src="logos/cutensor.png" alt="cuTENSOR" class="logo-icon">
+            <div class="logo-name">cuTENSOR</div>
+            <div class="logo-description">Tensor Operations</div>
+        </a>
+
+        <a href="https://docs.nvidia.com/cuda/cuda-math-api/" target="_blank" class="logo-card">
+            <img src="logos/cudamath.png" alt="CUDA MATH" class="logo-icon">
+            <div class="logo-name">CUDA MATH</div>
+            <div class="logo-description">Mathematical Functions</div>
+        </a>
+
+        <a href="https://docs.nvidia.com/cuda/thrust/" target="_blank" class="logo-card">
+            <img src="logos/thrust.png" alt="Thrust" class="logo-icon">
+            <div class="logo-name">Thrust</div>
+            <div class="logo-description">Parallel Algorithms</div>
+        </a>
+
+        <a href="https://nvidia.github.io/libcudacxx/" target="_blank" class="logo-card">
+            <img src="logos/libcuxx.png" alt="libcu++" class="logo-icon">
+            <div class="logo-name">libcu++</div>
+            <div class="logo-description">C++ Standard Library</div>
+        </a>
+
+        <a href="https://docs.nvidia.com/cuda/cub/" target="_blank" class="logo-card">
+            <img src="logos/cub.png" alt="CUB" class="logo-icon">
+            <div class="logo-name">CUB</div>
+            <div class="logo-description">Cooperative Primitives</div>
+        </a>
+
+        <a href="https://docs.nvidia.com/cuda/cuda-runtime-api/" target="_blank" class="logo-card">
+            <div class="logo-icon-text">CUDA</div>
+            <div class="logo-name">CUDA Runtime</div>
+            <div class="logo-description">Runtime API</div>
+        </a>
+    </div>
+</body>
+</html> 
