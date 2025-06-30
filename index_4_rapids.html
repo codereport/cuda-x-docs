@@ -238,42 +238,39 @@
             animation: float 4s ease-in-out infinite;
         }
 
-        /* RAPIDS special styling and grid sub-libraries */
+        /* RAPIDS special styling and sub-libraries */
         .rapids-container {
             position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             z-index: 10;
         }
 
-        .rapids-card:hover,
-        .rapids-container:hover .rapids-card {
+        .rapids-card {
+            position: relative;
+        }
+
+        .rapids-card:hover {
             background: rgba(123, 44, 191, 0.2) !important;
             border-color: rgba(123, 44, 191, 0.8) !important;
             box-shadow: 0 20px 40px rgba(123, 44, 191, 0.3) !important;
         }
 
-        .rapids-card:hover .logo-name,
-        .rapids-container:hover .rapids-card .logo-name {
+        .rapids-card:hover .logo-name {
             color: #7b2cbf !important;
         }
 
-        .rapids-card:hover .logo-icon,
-        .rapids-container:hover .rapids-card .logo-icon {
+        .rapids-card:hover .logo-icon {
             filter: hue-rotate(270deg) saturate(1.5) brightness(1.2) !important;
         }
 
-        /* Sub-libraries grid container */
         .rapids-sublibraries {
             position: absolute;
-            top: 190px;
+            top: 100%;
             left: 50%;
             transform: translateX(-50%);
             display: none;
-            grid-template-columns: repeat(3, 120px);
-            grid-template-rows: repeat(2, 120px);
-            gap: 10px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 10px;
             padding: 15px;
             background: rgba(123, 44, 191, 0.15);
             backdrop-filter: blur(15px);
@@ -281,16 +278,15 @@
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(123, 44, 191, 0.2);
             z-index: 100;
-            width: max-content;
+            width: 320px;
         }
 
-        .rapids-container:hover .rapids-sublibraries,
-        .rapids-sublibraries:hover {
+        .rapids-container:hover .rapids-sublibraries {
             display: grid;
-            animation: slideDown 0.3s ease-out;
+            animation: slideIn 0.3s ease-out;
         }
 
-        @keyframes slideDown {
+        @keyframes slideIn {
             from {
                 opacity: 0;
                 transform: translateX(-50%) translateY(-10px);
@@ -302,63 +298,42 @@
         }
 
         .rapids-sublibrary {
-            background: rgba(123, 44, 191, 0.2);
-            border: 1px solid rgba(123, 44, 191, 0.4);
+            background: rgba(123, 44, 191, 0.1);
+            border: 1px solid rgba(123, 44, 191, 0.3);
             border-radius: 8px;
-            padding: 15px;
+            padding: 10px;
             text-align: center;
             transition: all 0.2s ease;
             text-decoration: none;
             color: #ffffff;
-            font-size: 0.9rem;
-            min-height: 120px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .rapids-sublibrary:hover {
-            background: rgba(123, 44, 191, 0.4);
-            border-color: rgba(123, 44, 191, 0.7);
-            transform: translateY(-3px);
-            color: #ffffff;
-            box-shadow: 0 5px 15px rgba(123, 44, 191, 0.3);
-        }
-
-        .rapids-sublibrary .logo-icon-text {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #7b2cbf;
-            margin-bottom: 4px;
-            transition: all 0.3s ease;
-        }
-
-        .rapids-sublibrary .logo-name {
-            font-weight: 600;
-            color: #ffffff;
-            margin-bottom: 2px;
             font-size: 0.8rem;
         }
 
-        .rapids-sublibrary .logo-description {
-            font-size: 0.65rem;
-            color: #e0e0e0;
+        .rapids-sublibrary:hover {
+            background: rgba(123, 44, 191, 0.3);
+            border-color: rgba(123, 44, 191, 0.6);
+            transform: translateY(-2px);
+            color: #ffffff;
+        }
+
+        .rapids-sublibrary-name {
+            font-weight: 600;
+            color: #7b2cbf;
+            margin-bottom: 2px;
+        }
+
+        .rapids-sublibrary-desc {
+            font-size: 0.7rem;
+            color: #b0b0b0;
             opacity: 0.9;
         }
 
-        .rapids-sublibrary:hover .logo-icon-text {
+        .rapids-sublibrary:hover .rapids-sublibrary-name {
             color: #ffffff;
-            transform: scale(1.1);
         }
 
-        .rapids-sublibrary:hover .logo-name {
-            color: #7b2cbf;
-        }
-
-        .rapids-sublibrary:hover .logo-description {
-            color: #ffffff;
-            opacity: 1;
+        .rapids-sublibrary:hover .rapids-sublibrary-desc {
+            color: #e0e0e0;
         }
     </style>
 </head>
@@ -369,7 +344,7 @@
     </div>
 
     <div class="grid-container">
-        <!-- First row: cuBLAS, cuSPARSE, cuDNN, TensorRT, RAPIDS, Cooperative Groups -->
+        <!-- First row -->
         <a href="https://docs.nvidia.com/cuda/cublas/" target="_blank" class="logo-card">
             <img src="logos/cublas.png" alt="cuBLAS" class="logo-icon">
             <div class="logo-name">cuBLAS</div>
@@ -394,60 +369,19 @@
             <div class="logo-description">Inference Optimizer</div>
         </a>
 
-        <div class="rapids-container">
-            <a href="https://rapids.ai/" target="_blank" class="logo-card rapids-card">
-                <img src="logos/rapids.png" alt="RAPIDS" class="logo-icon">
-                <div class="logo-name">RAPIDS</div>
-                <div class="logo-description">Data Science Suite</div>
-            </a>
-
-            <!-- RAPIDS Sub-libraries in a 2x3 grid above -->
-            <div class="rapids-sublibraries">
-                <a href="https://docs.rapids.ai/api/cudf/stable/" target="_blank" class="rapids-sublibrary">
-                    <div class="logo-icon-text">cuDF</div>
-                    <div class="logo-name">cuDF</div>
-                    <div class="logo-description">DataFrames</div>
-                </a>
-
-                <a href="https://docs.rapids.ai/api/cuml/stable/" target="_blank" class="rapids-sublibrary">
-                    <div class="logo-icon-text">cuML</div>
-                    <div class="logo-name">cuML</div>
-                    <div class="logo-description">Machine Learning</div>
-                </a>
-
-                <a href="https://docs.rapids.ai/api/cugraph/stable/" target="_blank" class="rapids-sublibrary">
-                    <div class="logo-icon-text">cuGraph</div>
-                    <div class="logo-name">cuGraph</div>
-                    <div class="logo-description">Graph Analytics</div>
-                </a>
-
-                <a href="https://docs.rapids.ai/api/cuspatial/stable/" target="_blank" class="rapids-sublibrary">
-                    <div class="logo-icon-text">cuSpatial</div>
-                    <div class="logo-name">cuSpatial</div>
-                    <div class="logo-description">Spatial Analytics</div>
-                </a>
-
-                <a href="https://docs.rapids.ai/api/cusignal/stable/" target="_blank" class="rapids-sublibrary">
-                    <div class="logo-icon-text">cuSignal</div>
-                    <div class="logo-name">cuSignal</div>
-                    <div class="logo-description">Signal Processing</div>
-                </a>
-
-                <a href="https://docs.rapids.ai/api/cucim/stable/" target="_blank" class="rapids-sublibrary">
-                    <div class="logo-icon-text">cuCIM</div>
-                    <div class="logo-name">cuCIM</div>
-                    <div class="logo-description">Computer Vision</div>
-                </a>
-            </div>
-        </div>
-
-        <a href="https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#cooperative-groups" target="_blank" class="logo-card">
-            <div class="logo-icon-text">CG</div>
-            <div class="logo-name">Cooperative Groups</div>
-            <div class="logo-description">Thread Cooperation</div>
+        <a href="https://docs.nvidia.com/gpudirect-storage/" target="_blank" class="logo-card">
+            <div class="logo-icon-text">cuFILE</div>
+            <div class="logo-name">cuFILE (GDS)</div>
+            <div class="logo-description">GPU Direct Storage</div>
         </a>
 
-        <!-- Second row: cuFFT, cuDSS, CV CUDA, CUDA-Q, cuLitho, CUB -->
+        <a href="https://github.com/NVIDIA/nvbench" target="_blank" class="logo-card">
+            <img src="logos/nvbench.png" alt="NVBENCH" class="logo-icon">
+            <div class="logo-name">NVBENCH</div>
+            <div class="logo-description">GPU Benchmarking</div>
+        </a>
+
+        <!-- Second row -->
         <a href="https://docs.nvidia.com/cuda/cufft/" target="_blank" class="logo-card">
             <img src="logos/cufft.png" alt="cuFFT" class="logo-icon">
             <div class="logo-name">cuFFT</div>
@@ -466,25 +400,25 @@
             <div class="logo-description">Computer Vision</div>
         </a>
 
-        <a href="https://nvidia.github.io/cuda-quantum/" target="_blank" class="logo-card">
-            <div class="logo-icon-text">CUDA-Q</div>
-            <div class="logo-name">CUDA-Q</div>
-            <div class="logo-description">Quantum Computing</div>
-        </a>
-
         <a href="https://developer.nvidia.com/culitho" target="_blank" class="logo-card">
             <div class="logo-icon-text">cuLitho</div>
             <div class="logo-name">cuLitho</div>
             <div class="logo-description">Computational Lithography</div>
         </a>
 
-        <a href="https://docs.nvidia.com/cuda/cub/" target="_blank" class="logo-card">
-            <img src="logos/cub.png" alt="CUB" class="logo-icon">
-            <div class="logo-name">CUB</div>
-            <div class="logo-description">Cooperative Primitives</div>
+        <a href="https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#cooperative-groups" target="_blank" class="logo-card">
+            <div class="logo-icon-text">CG</div>
+            <div class="logo-name">Cooperative Groups</div>
+            <div class="logo-description">Thread Cooperation</div>
         </a>
 
-        <!-- Third row: cuRAND, cuSOLVER, GDS cufile, NCCL, NVSHMEM, CUTLASS -->
+        <a href="https://docs.nvidia.com/nvshmem/" target="_blank" class="logo-card">
+            <img src="logos/nvshmem.png" alt="NVSHMEM" class="logo-icon">
+            <div class="logo-name">NVSHMEM</div>
+            <div class="logo-description">Partitioned Global Memory</div>
+        </a>
+
+        <!-- Third row -->
         <a href="https://docs.nvidia.com/cuda/curand/" target="_blank" class="logo-card">
             <img src="logos/curand.png" alt="cuRAND" class="logo-icon">
             <div class="logo-name">cuRAND</div>
@@ -497,22 +431,44 @@
             <div class="logo-description">Linear Solvers</div>
         </a>
 
-        <a href="https://docs.nvidia.com/gpudirect-storage/" target="_blank" class="logo-card">
-            <div class="logo-icon-text">cuFILE</div>
-            <div class="logo-name">cuFILE (GDS)</div>
-            <div class="logo-description">GPU Direct Storage</div>
-        </a>
+        <div class="rapids-container">
+            <a href="https://rapids.ai/" target="_blank" class="logo-card rapids-card">
+                <img src="logos/rapids.png" alt="RAPIDS" class="logo-icon">
+                <div class="logo-name">RAPIDS</div>
+                <div class="logo-description">Data Science Suite</div>
+            </a>
+            <div class="rapids-sublibraries">
+                <a href="https://docs.rapids.ai/api/cudf/stable/" target="_blank" class="rapids-sublibrary">
+                    <div class="rapids-sublibrary-name">cuDF</div>
+                    <div class="rapids-sublibrary-desc">DataFrames</div>
+                </a>
+                <a href="https://docs.rapids.ai/api/cuml/stable/" target="_blank" class="rapids-sublibrary">
+                    <div class="rapids-sublibrary-name">cuML</div>
+                    <div class="rapids-sublibrary-desc">Machine Learning</div>
+                </a>
+                <a href="https://docs.rapids.ai/api/cugraph/stable/" target="_blank" class="rapids-sublibrary">
+                    <div class="rapids-sublibrary-name">cuGraph</div>
+                    <div class="rapids-sublibrary-desc">Graph Analytics</div>
+                </a>
+                <a href="https://docs.rapids.ai/api/cuspatial/stable/" target="_blank" class="rapids-sublibrary">
+                    <div class="rapids-sublibrary-name">cuSpatial</div>
+                    <div class="rapids-sublibrary-desc">Spatial Analytics</div>
+                </a>
+                <a href="https://docs.rapids.ai/api/cusignal/stable/" target="_blank" class="rapids-sublibrary">
+                    <div class="rapids-sublibrary-name">cuSignal</div>
+                    <div class="rapids-sublibrary-desc">Signal Processing</div>
+                </a>
+                <a href="https://docs.rapids.ai/api/cucim/stable/" target="_blank" class="rapids-sublibrary">
+                    <div class="rapids-sublibrary-name">cuCIM</div>
+                    <div class="rapids-sublibrary-desc">Computer Vision</div>
+                </a>
+            </div>
+        </div>
 
-        <a href="https://docs.nvidia.com/deeplearning/nccl/" target="_blank" class="logo-card">
-            <img src="logos/nccl.png" alt="NCCL" class="logo-icon">
-            <div class="logo-name">NCCL</div>
-            <div class="logo-description">Multi-GPU Communication</div>
-        </a>
-
-        <a href="https://docs.nvidia.com/nvshmem/" target="_blank" class="logo-card">
-            <img src="logos/nvshmem.png" alt="NVSHMEM" class="logo-icon">
-            <div class="logo-name">NVSHMEM</div>
-            <div class="logo-description">Partitioned Global Memory</div>
+        <a href="https://nvidia.github.io/cuda-quantum/" target="_blank" class="logo-card">
+            <div class="logo-icon-text">CUDA-Q</div>
+            <div class="logo-name">CUDA-Q</div>
+            <div class="logo-description">Quantum Computing</div>
         </a>
 
         <a href="https://github.com/NVIDIA/cutlass" target="_blank" class="logo-card">
@@ -521,7 +477,13 @@
             <div class="logo-description">GEMM Templates</div>
         </a>
 
-        <!-- Fourth row: cuTENSOR, CUDA Math, Thrust, CUDA Runtime, libcu++, NVBENCH -->
+        <a href="https://docs.nvidia.com/deeplearning/nccl/" target="_blank" class="logo-card">
+            <img src="logos/nccl.png" alt="NCCL" class="logo-icon">
+            <div class="logo-name">NCCL</div>
+            <div class="logo-description">Multi-GPU Communication</div>
+        </a>
+
+        <!-- Fourth row -->
         <a href="https://docs.nvidia.com/cuda/cutensor/" target="_blank" class="logo-card">
             <img src="logos/cutensor.png" alt="cuTENSOR" class="logo-icon">
             <div class="logo-name">cuTENSOR</div>
@@ -540,22 +502,22 @@
             <div class="logo-description">Parallel Algorithms</div>
         </a>
 
-        <a href="https://docs.nvidia.com/cuda/cuda-runtime-api/" target="_blank" class="logo-card">
-            <div class="logo-icon-text">CUDA</div>
-            <div class="logo-name">CUDA Runtime</div>
-            <div class="logo-description">Runtime API</div>
-        </a>
-
         <a href="https://nvidia.github.io/libcudacxx/" target="_blank" class="logo-card">
             <img src="logos/libcuxx.png" alt="libcu++" class="logo-icon">
             <div class="logo-name">libcu++</div>
             <div class="logo-description">C++ Standard Library</div>
         </a>
 
-        <a href="https://github.com/NVIDIA/nvbench" target="_blank" class="logo-card">
-            <img src="logos/nvbench.png" alt="NVBENCH" class="logo-icon">
-            <div class="logo-name">NVBENCH</div>
-            <div class="logo-description">GPU Benchmarking</div>
+        <a href="https://docs.nvidia.com/cuda/cub/" target="_blank" class="logo-card">
+            <img src="logos/cub.png" alt="CUB" class="logo-icon">
+            <div class="logo-name">CUB</div>
+            <div class="logo-description">Cooperative Primitives</div>
+        </a>
+
+        <a href="https://docs.nvidia.com/cuda/cuda-runtime-api/" target="_blank" class="logo-card">
+            <div class="logo-icon-text">CUDA</div>
+            <div class="logo-name">CUDA Runtime</div>
+            <div class="logo-description">Runtime API</div>
         </a>
     </div>
 </body>
