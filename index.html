@@ -606,6 +606,33 @@
             line-height: 1.2;
         }
 
+        /* Company badge styling */
+        .logo-cell {
+            position: relative;
+            overflow: visible;
+        }
+
+        .company-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+            transition: all 0.2s ease;
+            z-index: 20;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .company-badge:hover {
+            transform: scale(1.2);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+        }
+
         .logo-cell:hover .table-logo-icon {
             transform: scale(1.1);
             filter: brightness(1.2);
@@ -617,6 +644,7 @@
 
         .table-wrapper {
             overflow-x: auto;
+            overflow-y: visible;
             width: 100%;
             min-width: fit-content;
         }
@@ -629,6 +657,7 @@
             font-family: 'JetBrains Mono', 'Consolas', 'Monaco', 'Courier New', monospace;
             table-layout: auto;
             min-width: max-content;
+            overflow: visible;
         }
 
         .ecosystem-table tr {
@@ -675,6 +704,7 @@
 
         .ecosystem-table td {
             transition: all 0.3s ease;
+            overflow: visible;
         }
 
         .ecosystem-table td:hover {
@@ -1232,7 +1262,7 @@
 
         // Non-NVIDIA additions with logo info - each library gets its own column
         const nonNvidiaData = [
-            [{name: 'PyTorch', logo: 'pytorch.png'}, {name: 'Triton', logo: 'triton.png'}, {name: 'JAX', logo: 'jax.png'}], // Frameworks & DSLs
+            [{name: 'PyTorch', logo: 'pytorch.png', company: 'meta.png'}, {name: 'Triton', logo: 'triton.png', company: 'openai.png'}, {name: 'JAX', logo: 'jax.png', company: 'google.png'}], // Frameworks & DSLs
             [null, null, null], // SDKs - 3 empty columns
             [{name: 'CuPy', logo: 'cupy.png'}, null, null], // Domain-Specific Libraries - CuPy + 2 empty
             [null, null, null], // Accelerated Libraries - 3 empty columns
@@ -1293,6 +1323,16 @@
                         contentDiv.appendChild(logoImg);
                         contentDiv.appendChild(nameDiv);
                         cell.appendChild(contentDiv);
+                        
+                        // Add company badge if company logo is provided
+                        if (cellData.company) {
+                            const companyBadge = document.createElement('img');
+                            companyBadge.src = `logos/${cellData.company}`;
+                            companyBadge.alt = `Company logo`;
+                            companyBadge.className = 'company-badge';
+                            cell.appendChild(companyBadge);
+                        }
+                        
                         cell.className = 'logo-cell';
                     } else {
                         // Regular text cell
