@@ -633,7 +633,29 @@
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
         }
 
-        /* Python badge styling */
+        /* Language badge styling - shared */
+        .language-badge {
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+            transition: all 0.2s ease;
+            z-index: 20;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .language-badge:hover {
+            transform: scale(1.2);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Specific language badge classes for backwards compatibility */
         .python-badge {
             position: absolute;
             top: -8px;
@@ -1276,14 +1298,14 @@
         // NVIDIA-only table data
         const nvidiaTableData = [
             ['Framworks & DSLs', 'TensorRT', 'Omniverse', 'Warp'],
-            ['SDKs', 'RAPIDS', 'CUDA-Q', 'Holoscan'],
-            ['Domain-Specific Libraries', 'cuPyNumeric', 'cuDNN-python', ''],
-            ['Accelerated Libraries', 'cuda.parallel', 'nvmath-python', ''],
-            ['Communication Libraries', 'mpi4py', 'nvshmem4py', ''],
-            ['Device Libraries', 'cuda.cooperative', 'nvmath-python', ''],
-            ['Kernel Authoring', 'numba-cuda', 'cuTile', 'CUTLASS'],
-            ['Compiler Stack', '', '', ''],
-            ['Host Runtimes & Tools', 'cuda.bindings', 'cuda.core', 'Nsight Tools']
+            ['SDKs', 'RAPIDS', 'CUDA-Q', 'Holoscan', 'BioNemo', 'Arial'],
+            ['Domain-Specific Libraries', 'cuPyNumeric', 'cuDNN-python', 'cuQuantum', 'CUDA-CV', 'cuDNN', 'nvComp'],
+            ['Accelerated Libraries', 'cuda.parallel', 'nvmath-python', 'Thrust', 'cuBLAS', 'cuFFT', 'NPP'],
+            ['Communication Libraries', 'mpi4py', 'nvshmem4py', 'NCCL', 'NVSHMEM', 'MPI', 'UCX'],
+            ['Device Libraries', 'cuda.cooperative', 'nvmath-python', 'CUB', 'cuBlasDx', 'libcu++'],
+            ['Kernel Authoring', 'numba-cuda', 'cuTile', 'CUTLASS', 'CUDA C++', 'PTX', 'OpenCL', 'CUDA Fortran'],
+            ['Compiler Stack', 'nvcc', 'nvrtc', 'nvptx', 'ptxas'],
+            ['Host Runtimes & Tools', 'cuda.bindings', 'cuda.core', 'Nsight Tools', 'CUDA Runtime', 'Drivers', 'Installers']
         ];
 
         // Non-NVIDIA additions with logo info - each library gets its own column
@@ -1298,6 +1320,37 @@
             [null, null, null], // Compiler Stack - 3 empty columns
             [null, null, null] // Host Runtimes & Tools - 3 empty columns
         ];
+
+        // Function to determine language badge
+        function getLanguageBadge(cellText) {
+            if (!cellText) return null;
+            
+            const text = cellText.toString().toLowerCase();
+            
+            // C++ libraries and tools
+            const cppKeywords = [
+                'cuda c++', 'libcu++', 'cub', 'thrust', 'cutlass', 
+                'cublas', 'cufft', 'cusparse', 'cusolver', 'curand',
+                'cutensor', 'npp', 'nvcc', 'nvrtc', 'ptx', 'opencl',
+                'cuquantum', 'nvcomp', 'nccl', 'nvshmem'
+            ];
+            
+            // Fortran libraries
+            const fortranKeywords = ['cuda fortran', 'fortran'];
+            
+            // Check for Fortran first (more specific)
+            if (fortranKeywords.some(keyword => text.includes(keyword))) {
+                return { logo: 'fortran.png', alt: 'Fortran' };
+            }
+            
+            // Check for C++
+            if (cppKeywords.some(keyword => text.includes(keyword))) {
+                return { logo: 'cpp.png', alt: 'C++' };
+            }
+            
+            // Default to Python
+            return { logo: 'python.png', alt: 'Python' };
+        }
 
         // Combined table data
         function getCombinedTableData() {
@@ -1381,16 +1434,20 @@
                         }
                     }
                     
-                    // Add Python badge to all non-empty cells except "Nsight Tools" and first column
+                    // Add language badge to all non-empty cells except "Nsight Tools" and first column
                     const showLanguageBadge = document.getElementById('showLanguageBadge').checked;
                     const cellText = (cellData && typeof cellData === 'object') ? cellData.name : (cellData || '');
                     if (showLanguageBadge && cellText && cellText.toString().trim() && 
                         !cellText.toString().includes('Nsight Tools') && i !== 0) {
-                        const pythonBadge = document.createElement('img');
-                        pythonBadge.src = 'logos/python.png';
-                        pythonBadge.alt = 'Python';
-                        pythonBadge.className = 'python-badge';
-                        cell.appendChild(pythonBadge);
+                        
+                        const languageBadgeInfo = getLanguageBadge(cellText);
+                        if (languageBadgeInfo) {
+                            const languageBadge = document.createElement('img');
+                            languageBadge.src = `logos/${languageBadgeInfo.logo}`;
+                            languageBadge.alt = languageBadgeInfo.alt;
+                            languageBadge.className = 'language-badge';
+                            cell.appendChild(languageBadge);
+                        }
                     }
                     
                     row.appendChild(cell);

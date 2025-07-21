@@ -1,0 +1,9 @@
+Framworks & DSLs, 
+SDKs, BioNemo, Arial
+Domain-Specific Libraries, cuQuantum, CUDA-CV, cuDNN, nvComp
+Accelerated Libraries, Thrust, cuBlas, cuFFT, NPP
+Communication Libraries, NCCL, NVSHMEM, MPI, UCX
+Device Libraries, CUB, cuBlasDx, libcu++
+Kernel Authoring, CUDA C++, PTX, OpenCL, CUDA Fortran
+Compiler Stack, nvcc, nvrtc, nvptx, ptxas
+Host Runtimes & Tools, CUDA Runtime, Drivers, Installers
