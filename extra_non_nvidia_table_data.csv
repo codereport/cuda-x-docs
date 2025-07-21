@@ -1,7 +1,7 @@
 Framworks & DSLs, PyTorch, OpenAI Triton, JAX
 SDKs,
-Domain-Specific Libraries, 
-Accelerated Libraries, CuPy
+Domain-Specific Libraries, CuPy
+Accelerated Libraries,
 Communication Libraries,
 Device Libraries, 
 Kernel Authoring,
