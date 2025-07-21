@@ -496,10 +496,123 @@
             width: 90%;
             max-width: 1200px;
             padding: 20px;
+            position: relative;
+        }
+
+        /* Settings Icon */
+        .settings-icon {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            fill: #76b900;
+            transition: all 0.3s ease;
+            z-index: 20;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+
+
+        .settings-icon:hover {
+            fill: #ffffff;
+            transform: rotate(45deg);
+        }
+
+        /* Settings Panel */
+        .settings-panel {
+            position: absolute;
+            top: 50px;
+            left: 10px;
+            width: 250px;
+            background: rgba(0, 0, 0, 0.95);
+            border: 1px solid rgba(118, 185, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            display: none;
+            z-index: 30;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .settings-panel.show {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .settings-title {
+            color: #76b900;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .settings-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .settings-checkbox {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            accent-color: #76b900;
+        }
+
+        .settings-label {
+            color: #ffffff;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        /* Logo cell styling */
+        .logo-cell {
+            padding: 15px 20px !important;
+        }
+
+        .logo-cell-content {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .table-logo-icon {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            filter: brightness(1);
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .table-logo-name {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #ffffff;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .logo-cell:hover .table-logo-icon {
+            transform: scale(1.1);
+            filter: brightness(1.2);
+        }
+
+        .logo-cell:hover .table-logo-name {
+            color: #76b900;
         }
 
         .table-wrapper {
             overflow-x: auto;
+            width: 100%;
+            min-width: fit-content;
         }
 
         .ecosystem-table {
@@ -508,6 +621,12 @@
             border-spacing: 10px;
             background: transparent;
             font-family: 'JetBrains Mono', 'Consolas', 'Monaco', 'Courier New', monospace;
+            table-layout: auto;
+            min-width: max-content;
+        }
+
+        .ecosystem-table tr {
+            display: table-row;
         }
 
         .ecosystem-table th,
@@ -520,6 +639,15 @@
             transition: all 0.3s ease;
             font-size: 0.9rem;
             font-weight: bold;
+            display: table-cell;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        /* Override for logo cells to use flex while maintaining table-cell behavior */
+        .ecosystem-table td.logo-cell {
+            display: table-cell;
+            vertical-align: middle;
         }
 
         .ecosystem-table th {
@@ -799,6 +927,20 @@
 
     <!-- Table Container (new table view) -->
     <div class="table-container" id="tableView" style="display: none;">
+        <!-- Settings Icon -->
+        <svg class="settings-icon" id="settingsIcon" viewBox="0 0 24 24">
+            <path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11.03L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.22,8.95 2.27,9.22 2.46,9.37L4.57,11.03C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.22,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"/>
+        </svg>
+
+        <!-- Settings Panel -->
+        <div class="settings-panel" id="settingsPanel">
+            <div class="settings-title">Table Settings</div>
+            <div class="settings-option">
+                <input type="checkbox" id="includeNonNvidia" class="settings-checkbox">
+                <label for="includeNonNvidia" class="settings-label">Include non-NVIDIA libraries</label>
+            </div>
+        </div>
+
         <div class="table-wrapper">
             <table class="ecosystem-table">
                 <tbody id="tableBody">
@@ -1056,16 +1198,21 @@
                 gridView.style.display = 'none';
                 tableView.style.display = 'block';
                 viewToggle.classList.add('table-mode');
+                settingsIcon.style.opacity = '1';
+                settingsIcon.style.pointerEvents = 'auto';
             } else {
                 // Switch to grid view
                 gridView.style.display = 'grid';
                 tableView.style.display = 'none';
                 viewToggle.classList.remove('table-mode');
+                settingsIcon.style.opacity = '0';
+                settingsIcon.style.pointerEvents = 'none';
+                settingsPanel.classList.remove('show');
             }
         });
 
-        // Table data from CSV
-        const tableData = [
+        // NVIDIA-only table data
+        const nvidiaTableData = [
             ['Framworks & DSLs', 'TensorRT', 'Omniverse', 'Warp'],
             ['SDKs', 'RAPIDS', 'CUDA-Q', 'Holoscan'],
             ['Domain-Specific Libraries', 'cuPyNumeric', 'cuDNN-python', ''],
@@ -1077,29 +1224,85 @@
             ['Host Runtimes & Tools', 'cuda.bindings', 'cuda.core', 'Nsight Tools']
         ];
 
+        // Non-NVIDIA additions with logo info - each library gets its own column
+        const nonNvidiaData = [
+            [{name: 'PyTorch', logo: 'pytorch.png'}, {name: 'OpenAI Triton', logo: 'triton.png'}, {name: 'JAX', logo: 'jax.png'}], // Frameworks & DSLs
+            [null, null, null], // SDKs - 3 empty columns
+            [null, null, null], // Domain-Specific Libraries - 3 empty columns
+            [{name: 'CuPy', logo: 'cupy.png'}, null, null], // Accelerated Libraries - CuPy + 2 empty
+            [null, null, null], // Communication Libraries - 3 empty columns
+            [null, null, null], // Device Libraries - 3 empty columns
+            [null, null, null], // Kernel Authoring - 3 empty columns
+            [null, null, null], // Compiler Stack - 3 empty columns
+            [null, null, null] // Host Runtimes & Tools - 3 empty columns
+        ];
+
+        // Combined table data
+        function getCombinedTableData() {
+            const combined = [];
+            for (let i = 0; i < nvidiaTableData.length; i++) {
+                const nvidiaRow = [...nvidiaTableData[i]];
+                const nonNvidiaRow = nonNvidiaData[i] || [];
+                
+                // Simply spread the non-NVIDIA row - each item should be a separate column
+                combined.push([...nvidiaRow, ...nonNvidiaRow]);
+            }
+            return combined;
+        }
+
         // Function to populate the table
         function populateTable() {
+            const includeNonNvidia = document.getElementById('includeNonNvidia').checked;
+            const tableData = includeNonNvidia ? getCombinedTableData() : nvidiaTableData;
+            
+            // Determine max columns needed
+            const maxCols = Math.max(...tableData.map(row => row.length));
+            
             const tableBody = document.getElementById('tableBody');
             tableBody.innerHTML = ''; // Clear existing rows
 
-            tableData.forEach(rowData => {
+            tableData.forEach((rowData, rowIndex) => {
                 const row = document.createElement('tr');
                 
-                // Create 4 cells for each row
-                for (let i = 0; i < 4; i++) {
+                // Create cells for the maximum number of columns
+                for (let i = 0; i < maxCols; i++) {
                     const cell = document.createElement('td');
-                    const cellContent = rowData[i] || '';
-                    cell.textContent = cellContent;
+                    const cellData = rowData[i];
                     
-                    // Add empty-cell class if cell is empty
-                    if (!cellContent.trim()) {
-                        cell.classList.add('empty-cell');
-                    }
-                    
-                    // Style the first column (category) differently
-                    if (i === 0 && rowData[i]) {
-                        cell.style.fontWeight = '600';
-                        cell.style.color = '#76b900';
+                    // Check if this is a logo object (non-NVIDIA library)
+                    if (cellData && typeof cellData === 'object' && cellData.logo) {
+                        // Create logo + text structure inside a flex container
+                        const contentDiv = document.createElement('div');
+                        contentDiv.className = 'logo-cell-content';
+                        
+                        const logoImg = document.createElement('img');
+                        logoImg.src = `logos/${cellData.logo}`;
+                        logoImg.alt = cellData.name;
+                        logoImg.className = 'table-logo-icon';
+                        
+                        const nameDiv = document.createElement('div');
+                        nameDiv.textContent = cellData.name;
+                        nameDiv.className = 'table-logo-name';
+                        
+                        contentDiv.appendChild(logoImg);
+                        contentDiv.appendChild(nameDiv);
+                        cell.appendChild(contentDiv);
+                        cell.className = 'logo-cell';
+                    } else {
+                        // Regular text cell
+                        const cellContent = cellData || '';
+                        cell.textContent = cellContent;
+                        
+                        // Add empty-cell class if cell is empty or null
+                        if (!cellContent || cellContent === null || !cellContent.toString().trim()) {
+                            cell.classList.add('empty-cell');
+                        }
+                        
+                        // Style the first column (category) differently
+                        if (i === 0 && cellData) {
+                            cell.style.fontWeight = '600';
+                            cell.style.color = '#76b900';
+                        }
                     }
                     
                     row.appendChild(cell);
@@ -1108,6 +1311,29 @@
                 tableBody.appendChild(row);
             });
         }
+
+        // Settings functionality
+        const settingsIcon = document.getElementById('settingsIcon');
+        const settingsPanel = document.getElementById('settingsPanel');
+        const includeNonNvidiaCheckbox = document.getElementById('includeNonNvidia');
+
+        // Toggle settings panel
+        settingsIcon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            settingsPanel.classList.toggle('show');
+        });
+
+        // Close settings panel when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!settingsPanel.contains(e.target) && !settingsIcon.contains(e.target)) {
+                settingsPanel.classList.remove('show');
+            }
+        });
+
+        // Handle checkbox change
+        includeNonNvidiaCheckbox.addEventListener('change', () => {
+            populateTable();
+        });
 
         // Populate table on page load
         populateTable();
