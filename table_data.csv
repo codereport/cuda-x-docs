@@ -1,0 +1,9 @@
+Framworks & DSLs, TensorRT, Omniverse, Warp
+SDKs, RAPIDS, CUDA-Q, Holoscan
+Domain-Specific Libraries, cuPyNumeric, cuDNN-python
+Accelererated Libraries, cuda.parallel, nvmath-python
+Communication Libraries, mpi4py, nvshmem4py
+Device Libraries, cuda.cooperative, nvmath-python
+Kernel Authoring, numba-cuda, cuTile, CUTLASS
+Compiler Stack
+Host Runtimes & Tools, cuda.bindings, cuda.core, Nsigth Tools

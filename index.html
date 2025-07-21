@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CUDA Ecosystem</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -445,17 +448,165 @@
             box-shadow: 0 20px 40px rgba(123, 44, 191, 0.3) !important;
             border-color: rgba(123, 44, 191, 0.8) !important;
         }
+
+        /* View Toggle Styles */
+        .view-toggle {
+            margin-top: 20px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(118, 185, 0, 0.3);
+            border-radius: 15px;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch:hover {
+            border-color: rgba(118, 185, 0, 0.6);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 26px;
+            height: 26px;
+            background: #76b900;
+            border-radius: 13px;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .toggle-switch.table-mode .toggle-slider {
+            transform: translateX(30px);
+        }
+
+        /* Table View Styles */
+        .table-container {
+            margin-top: 20px;
+            width: 90%;
+            max-width: 1200px;
+            padding: 20px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        .ecosystem-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 10px;
+            background: transparent;
+            font-family: 'JetBrains Mono', 'Consolas', 'Monaco', 'Courier New', monospace;
+        }
+
+        .ecosystem-table th,
+        .ecosystem-table td {
+            padding: 15px 20px;
+            text-align: center;
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .ecosystem-table th {
+            background: rgba(118, 185, 0, 0.15);
+            font-weight: 600;
+            color: #76b900;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            border-color: rgba(118, 185, 0, 0.3);
+        }
+
+        .ecosystem-table td:first-child {
+            font-weight: 600;
+            color: #76b900;
+            background: rgba(118, 185, 0, 0.1);
+            border-color: rgba(118, 185, 0, 0.3);
+        }
+
+        .ecosystem-table td {
+            transition: all 0.3s ease;
+        }
+
+        .ecosystem-table td:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(118, 185, 0, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .ecosystem-table td:first-child:hover {
+            background: rgba(118, 185, 0, 0.2);
+            color: #ffffff;
+        }
+
+        /* Empty cell styling */
+        .ecosystem-table td.empty-cell {
+            background: #000000 !important;
+            border: 1px solid #000000;
+            transition: none !important;
+        }
+
+        .ecosystem-table td.empty-cell:hover {
+            background: #000000 !important;
+            border-color: #000000 !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Responsive table */
+        @media (max-width: 768px) {
+            .ecosystem-table th,
+            .ecosystem-table td {
+                padding: 8px 10px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .table-container {
+                padding: 15px;
+            }
+            
+            .ecosystem-table th,
+            .ecosystem-table td {
+                padding: 6px 8px;
+                font-size: 0.8rem;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>CUDA Ecosystem</h1>
+        <!-- Toggle button for Grid/Table view -->
+        <div class="view-toggle">
+            <div id="viewToggle" class="toggle-switch">
+                <div class="toggle-slider"></div>
+            </div>
+        </div>
     </div>
 
     <!-- Category label that appears on hover -->
     <div id="category-label" class="category-label"></div>
 
-    <div class="grid-container">
+    <!-- Grid Container (existing grid view) -->
+    <div class="grid-container" id="gridView">
         <!-- First row: cuBLAS, cuSPARSE, cuDNN, TensorRT, RAPIDS, Cooperative Groups -->
         <a href="https://docs.nvidia.com/cuda/cublas/" target="_blank" class="logo-card" data-category="math">
             <img src="logos/cublas.png" alt="cuBLAS" class="logo-icon">
@@ -646,6 +797,17 @@
         </a>
     </div>
 
+    <!-- Table Container (new table view) -->
+    <div class="table-container" id="tableView" style="display: none;">
+        <div class="table-wrapper">
+            <table class="ecosystem-table">
+                <tbody id="tableBody">
+                    <!-- Table rows will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <script>
         // Category names mapping
         const categoryNames = {
@@ -695,6 +857,9 @@
         const gridContainer = document.querySelector('.grid-container');
         const categoryLabel = document.getElementById('category-label');
         const logoCards = document.querySelectorAll('.logo-card[data-category]');
+        const gridView = document.getElementById('gridView');
+        const tableView = document.getElementById('tableView');
+        const viewToggle = document.getElementById('viewToggle');
 
         // Initialize category label system
         let currentCategory = null;
@@ -879,6 +1044,74 @@
                 }
             });
         }
+
+        // View Toggle Functionality
+        let isTableMode = false;
+
+        viewToggle.addEventListener('click', () => {
+            isTableMode = !isTableMode;
+            
+            if (isTableMode) {
+                // Switch to table view
+                gridView.style.display = 'none';
+                tableView.style.display = 'block';
+                viewToggle.classList.add('table-mode');
+            } else {
+                // Switch to grid view
+                gridView.style.display = 'grid';
+                tableView.style.display = 'none';
+                viewToggle.classList.remove('table-mode');
+            }
+        });
+
+        // Table data from CSV
+        const tableData = [
+            ['Framworks & DSLs', 'TensorRT', 'Omniverse', 'Warp'],
+            ['SDKs', 'RAPIDS', 'CUDA-Q', 'Holoscan'],
+            ['Domain-Specific Libraries', 'cuPyNumeric', 'cuDNN-python', ''],
+            ['Accelererated Libraries', 'cuda.parallel', 'nvmath-python', ''],
+            ['Communication Libraries', 'mpi4py', 'nvshmem4py', ''],
+            ['Device Libraries', 'cuda.cooperative', 'nvmath-python', ''],
+            ['Kernel Authoring', 'numba-cuda', 'cuTile', 'CUTLASS'],
+            ['Compiler Stack', '', '', ''],
+            ['Host Runtimes & Tools', 'cuda.bindings', 'cuda.core', 'Nsight Tools']
+        ];
+
+        // Function to populate the table
+        function populateTable() {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            tableData.forEach(rowData => {
+                const row = document.createElement('tr');
+                
+                // Create 4 cells for each row
+                for (let i = 0; i < 4; i++) {
+                    const cell = document.createElement('td');
+                    const cellContent = rowData[i] || '';
+                    cell.textContent = cellContent;
+                    
+                    // Add empty-cell class if cell is empty
+                    if (!cellContent.trim()) {
+                        cell.classList.add('empty-cell');
+                    }
+                    
+                    // Style the first column (category) differently
+                    if (i === 0 && rowData[i]) {
+                        cell.style.fontWeight = '600';
+                        cell.style.color = '#76b900';
+                    }
+                    
+                    row.appendChild(cell);
+                }
+                
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Populate table on page load
+        populateTable();
+
     </script>
 </body>
 </html> 
