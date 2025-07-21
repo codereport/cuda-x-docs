@@ -641,13 +641,24 @@
             width: 22px;
             height: 22px;
             object-fit: contain;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 2px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+            background: transparent;
+            padding: 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
             transition: all 0.2s ease;
             z-index: 20;
-            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        /* Language-specific cell background colors */
+        .cell-python {
+            background: rgba(255, 235, 59, 0.15) !important;
+        }
+
+        .cell-cpp {
+            background: rgba(33, 150, 243, 0.15) !important;
+        }
+
+        .cell-fortran {
+            background: rgba(156, 39, 176, 0.15) !important;
         }
 
         .language-badge:hover {
@@ -1327,20 +1338,37 @@
             
             const text = cellText.toString().toLowerCase();
             
+            // Items that should have no badge
+            const noBadgeKeywords = ['drivers', 'installers'];
+            
+            // Check for no badge items first
+            if (noBadgeKeywords.some(keyword => text.includes(keyword))) {
+                return null;
+            }
+            
+            // Python libraries (check before C++ to catch nvshmem4py)
+            const pythonKeywords = ['python', 'py', 'mpi4py', 'nvshmem4py'];
+            
             // C++ libraries and tools
             const cppKeywords = [
                 'cuda c++', 'libcu++', 'cub', 'thrust', 'cutlass', 
                 'cublas', 'cufft', 'cusparse', 'cusolver', 'curand',
                 'cutensor', 'npp', 'nvcc', 'nvrtc', 'ptx', 'opencl',
-                'cuquantum', 'nvcomp', 'nccl', 'nvshmem'
+                'cuquantum', 'nvcomp', 'nccl', 'nvshmem', 'cudnn',
+                'mpi', 'ucx', 'cuda runtime'
             ];
             
             // Fortran libraries
             const fortranKeywords = ['cuda fortran', 'fortran'];
             
-            // Check for Fortran first (more specific)
+            // Check for Fortran first (most specific)
             if (fortranKeywords.some(keyword => text.includes(keyword))) {
                 return { logo: 'fortran.png', alt: 'Fortran' };
+            }
+            
+            // Check for Python (before C++ to catch nvshmem4py)
+            if (pythonKeywords.some(keyword => text.includes(keyword))) {
+                return { logo: 'python.png', alt: 'Python' };
             }
             
             // Check for C++
@@ -1447,6 +1475,15 @@
                             languageBadge.alt = languageBadgeInfo.alt;
                             languageBadge.className = 'language-badge';
                             cell.appendChild(languageBadge);
+                            
+                            // Add language-specific background color to cell
+                            if (languageBadgeInfo.alt === 'Python') {
+                                cell.classList.add('cell-python');
+                            } else if (languageBadgeInfo.alt === 'C++') {
+                                cell.classList.add('cell-cpp');
+                            } else if (languageBadgeInfo.alt === 'Fortran') {
+                                cell.classList.add('cell-fortran');
+                            }
                         }
                     }
                     
