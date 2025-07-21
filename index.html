@@ -633,6 +633,28 @@
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
         }
 
+        /* Python badge styling */
+        .python-badge {
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+            transition: all 0.2s ease;
+            z-index: 20;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .python-badge:hover {
+            transform: scale(1.2);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+        }
+
         .logo-cell:hover .table-logo-icon {
             transform: scale(1.1);
             filter: brightness(1.2);
@@ -974,6 +996,10 @@
             <div class="settings-option">
                 <input type="checkbox" id="includeNonNvidia" class="settings-checkbox">
                 <label for="includeNonNvidia" class="settings-label">Include non-NVIDIA libraries</label>
+            </div>
+            <div class="settings-option">
+                <input type="checkbox" id="showLanguageBadge" class="settings-checkbox">
+                <label for="showLanguageBadge" class="settings-label">Show language badge</label>
             </div>
         </div>
 
@@ -1342,6 +1368,10 @@
                         // Add empty-cell class if cell is empty or null
                         if (!cellContent || cellContent === null || !cellContent.toString().trim()) {
                             cell.classList.add('empty-cell');
+                        } else {
+                            // Add position relative for badge positioning (non-empty cells)
+                            cell.style.position = 'relative';
+                            cell.style.overflow = 'visible';
                         }
                         
                         // Style the first column (category) differently
@@ -1349,6 +1379,18 @@
                             cell.style.fontWeight = '600';
                             cell.style.color = '#76b900';
                         }
+                    }
+                    
+                    // Add Python badge to all non-empty cells except "Nsight Tools" and first column
+                    const showLanguageBadge = document.getElementById('showLanguageBadge').checked;
+                    const cellText = (cellData && typeof cellData === 'object') ? cellData.name : (cellData || '');
+                    if (showLanguageBadge && cellText && cellText.toString().trim() && 
+                        !cellText.toString().includes('Nsight Tools') && i !== 0) {
+                        const pythonBadge = document.createElement('img');
+                        pythonBadge.src = 'logos/python.png';
+                        pythonBadge.alt = 'Python';
+                        pythonBadge.className = 'python-badge';
+                        cell.appendChild(pythonBadge);
                     }
                     
                     row.appendChild(cell);
@@ -1362,6 +1404,7 @@
         const settingsIcon = document.getElementById('settingsIcon');
         const settingsPanel = document.getElementById('settingsPanel');
         const includeNonNvidiaCheckbox = document.getElementById('includeNonNvidia');
+        const showLanguageBadgeCheckbox = document.getElementById('showLanguageBadge');
 
         // Toggle settings panel
         settingsIcon.addEventListener('click', (e) => {
@@ -1376,8 +1419,12 @@
             }
         });
 
-        // Handle checkbox change
+        // Handle checkbox changes
         includeNonNvidiaCheckbox.addEventListener('change', () => {
+            populateTable();
+        });
+
+        showLanguageBadgeCheckbox.addEventListener('change', () => {
             populateTable();
         });
 
