@@ -456,6 +456,73 @@
             border-color: rgba(123, 44, 191, 0.8) !important;
         }
 
+        /* RAPIDS cell highlighting */
+        .rapids-cell:hover {
+            background: rgba(123, 44, 191, 0.3) !important;
+            border-color: rgba(123, 44, 191, 0.8) !important;
+            box-shadow: 0 5px 15px rgba(123, 44, 191, 0.4) !important;
+        }
+
+        /* RAPIDS sub-libraries row */
+        .rapids-subrow {
+            display: none !important;
+        }
+
+        .rapids-subrow.show {
+            display: table-row !important;
+            animation: slideDownRow 0.3s ease-out;
+        }
+
+        @keyframes slideDownRow {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .rapids-subrow td {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #ffffff;
+            position: relative;
+            overflow: visible;
+            vertical-align: middle;
+        }
+
+        /* Ensure badges in RAPIDS sub-row are positioned correctly */
+        .rapids-subrow td .github-star-badge {
+            position: absolute !important;
+            bottom: 2px !important;
+            right: 2px !important;
+        }
+
+        .rapids-subrow td:hover {
+            background: rgba(123, 44, 191, 0.3) !important;
+            border-color: rgba(123, 44, 191, 0.8) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(123, 44, 191, 0.4) !important;
+        }
+
+        .rapids-subrow a {
+            color: #ffffff;
+            text-decoration: none;
+            display: inline;
+        }
+
+        .rapids-subrow a:hover {
+            color: #ffffff;
+            text-decoration: none;
+        }
+
         /* View Toggle Styles */
         .view-toggle {
             margin-top: 10px;
@@ -1550,7 +1617,7 @@
             }
             
             // Python libraries (check before C++ to catch nvshmem4py)
-            const pythonKeywords = ['python', 'py', 'mpi4py', 'nvshmem4py'];
+            const pythonKeywords = ['python', 'py', 'mpi4py', 'nvshmem4py', 'rapids', 'cudf', 'cuml', 'cugraph', 'raft', 'cuspatial', 'rmm', 'cuvs', 'cucim'];
             
             // C++ libraries and tools
             const cppKeywords = [
@@ -1681,7 +1748,16 @@
                     } else {
                         // Regular text cell
                         const cellContent = cellData || '';
-                        cell.textContent = cellContent;
+                        
+                        // Special handling for RAPIDS
+                        if (cellContent === 'RAPIDS') {
+                            cell.textContent = 'RAPIDS';
+                            cell.classList.add('rapids-cell');
+                            // Don't store RAPIDS for dependency lookup since sub-libraries handle it
+                        } else {
+                            // Regular text cell
+                            cell.textContent = cellContent;
+                        }
                         
                         // Add empty-cell class if cell is empty or null
                         if (!cellContent || cellContent === null || !cellContent.toString().trim()) {
@@ -1691,8 +1767,8 @@
                             cell.style.position = 'relative';
                             cell.style.overflow = 'visible';
                             
-                            // Store normalized library name for dependency lookup (exclude header column)
-                            if (!isActualFirstColumn) {
+                            // Store normalized library name for dependency lookup (exclude header column and RAPIDS)
+                            if (!isActualFirstColumn && cellContent !== 'RAPIDS') {
                                 cell.dataset.library = normalizeName(cellContent);
                             }
                         }
@@ -1765,6 +1841,194 @@
                 }
                 
                 tableBody.appendChild(row);
+            });
+
+            // Add RAPIDS sub-libraries row after SDKs row
+            addRapidsSubRow();
+        }
+
+        // Function to create RAPIDS sub-libraries row
+        function addRapidsSubRow() {
+            const tableBody = document.getElementById('tableBody');
+            const rows = tableBody.querySelectorAll('tr');
+            
+            // Remove existing RAPIDS sub-row if it exists (for re-population)
+            const existingSubRow = document.getElementById('rapids-subrow');
+            if (existingSubRow) {
+                existingSubRow.remove();
+            }
+            
+            // Find the SDKs row
+            let sdksRowIndex = -1;
+            rows.forEach((row, index) => {
+                const firstCell = row.querySelector('td');
+                if (firstCell && firstCell.textContent.includes('SDKs')) {
+                    sdksRowIndex = index;
+                }
+            });
+
+            if (sdksRowIndex === -1) return;
+
+            // Create RAPIDS sub-libraries row with fixed structure
+            const rapidsSubRow = document.createElement('tr');
+            rapidsSubRow.className = 'rapids-subrow'; // Only base class, no 'show'
+            rapidsSubRow.id = 'rapids-subrow';
+            // Explicitly ensure it's hidden
+            rapidsSubRow.style.display = 'none';
+
+            // First cell empty (no category label)
+            const emptyCell = document.createElement('td');
+            emptyCell.classList.add('empty-cell');
+            rapidsSubRow.appendChild(emptyCell);
+
+            // Define RAPIDS sub-libraries
+            const subLibraries = [
+                { name: 'cuDF', url: 'https://docs.rapids.ai/api/cudf/stable/' },
+                { name: 'cuML', url: 'https://docs.rapids.ai/api/cuml/stable/' },
+                { name: 'cuGraph', url: 'https://docs.rapids.ai/api/cugraph/stable/' },
+                { name: 'RAFT', url: 'https://docs.rapids.ai/api/raft/stable/' },
+                { name: 'cuSpatial', url: 'https://docs.rapids.ai/api/cuspatial/stable/' },
+                { name: 'rmm', url: 'https://docs.rapids.ai/api/rmm/stable/' },
+                { name: 'cuVS', url: 'https://docs.rapids.ai/api/cuvs/stable/' },
+                { name: 'cuCIM', url: 'https://docs.rapids.ai/api/cucim/stable/' }
+            ];
+
+            // Add sub-library cells
+            subLibraries.forEach(lib => {
+                const cell = document.createElement('td');
+                cell.style.position = 'relative';
+                cell.style.overflow = 'visible';
+                
+                const link = document.createElement('a');
+                link.href = lib.url;
+                link.target = '_blank';
+                link.textContent = lib.name;
+                link.dataset.library = lib.name; // For dependency lookup
+                
+                cell.appendChild(link);
+                
+                // Add language badge and background color
+                const showLanguageBadge = document.getElementById('showLanguageBadge').checked;
+                if (showLanguageBadge) {
+                    const languageBadgeInfo = getLanguageBadge(lib.name);
+                    if (languageBadgeInfo) {
+                        const languageBadge = document.createElement('img');
+                        languageBadge.src = `logos/${languageBadgeInfo.logo}`;
+                        languageBadge.alt = languageBadgeInfo.alt;
+                        languageBadge.className = 'language-badge';
+                        cell.appendChild(languageBadge);
+                        
+                        // Add language-specific background color to cell
+                        if (languageBadgeInfo.alt === 'Python') {
+                            cell.classList.add('cell-python');
+                        } else if (languageBadgeInfo.alt === 'C++') {
+                            cell.classList.add('cell-cpp');
+                        } else if (languageBadgeInfo.alt === 'Fortran') {
+                            cell.classList.add('cell-fortran');
+                        }
+                    }
+                }
+                
+                // Add GitHub star badge (same logic as regular table cells)
+                const showGitHubStarsCheckbox = document.getElementById('showGitHubStars');
+                const showGitHubStars = showGitHubStarsCheckbox ? showGitHubStarsCheckbox.checked : true; // Default to true
+                
+                if (showGitHubStars) {
+                    const repoData = githubRepoData[lib.name];
+                    if (repoData) {
+                        const showCCCLBadgeColorCheckbox = document.getElementById('showCCCLBadgeColor');
+                        const showCCCLBadgeColor = showCCCLBadgeColorCheckbox ? showCCCLBadgeColorCheckbox.checked : true;
+                        
+                        const badge = document.createElement('a');
+                        badge.className = (repoData.isCCCL && showCCCLBadgeColor) ? 'github-star-badge show cccl' : 'github-star-badge show';
+                        badge.href = `https://github.com/${repoData.repo}`;
+                        badge.target = '_blank';
+                        badge.title = repoData.isCCCL ? 
+                            `View ${lib.name} on GitHub (part of CUDA C++ Core Libraries - ${repoData.stars} stars)` :
+                            `View ${lib.name} on GitHub (${repoData.stars} stars)`;
+                        
+                        const starIcon = document.createElement('span');
+                        starIcon.className = 'star-icon';
+                        starIcon.textContent = '★';
+                        
+                        const starCount = document.createElement('span');
+                        starCount.className = 'star-count';
+                        starCount.textContent = repoData.stars;
+                        
+                        badge.appendChild(starIcon);
+                        badge.appendChild(starCount);
+                        cell.appendChild(badge);
+                    }
+                }
+                
+                rapidsSubRow.appendChild(cell);
+            });
+
+            // Calculate remaining empty cells dynamically
+            const includeNonNvidia = document.getElementById('includeNonNvidia').checked;
+            const tableData = includeNonNvidia ? getCombinedTableData() : nvidiaTableData;
+            const maxCols = Math.max(...tableData.map(row => row.length));
+            const remainingCols = maxCols - 1 - subLibraries.length; // -1 for first empty cell
+            
+            for (let i = 0; i < remainingCols; i++) {
+                const emptyCell = document.createElement('td');
+                emptyCell.classList.add('empty-cell');
+                rapidsSubRow.appendChild(emptyCell);
+            }
+
+            // Insert after SDKs row immediately (pre-create the structure)
+            const sdksRow = rows[sdksRowIndex];
+            sdksRow.parentNode.insertBefore(rapidsSubRow, sdksRow.nextSibling);
+
+            // Add hover events immediately
+            addRapidsHoverEvents();
+        }
+
+        // Function to handle RAPIDS hover events
+        function addRapidsHoverEvents() {
+            const rapidsCell = document.querySelector('.rapids-cell');
+            const rapidsSubRow = document.getElementById('rapids-subrow');
+            
+            if (!rapidsCell || !rapidsSubRow) return;
+
+            let hoverTimeout;
+
+            // Show sub-row on RAPIDS hover
+            rapidsCell.addEventListener('mouseenter', () => {
+                clearTimeout(hoverTimeout);
+                // Clear any existing dependency arrows
+                clearArrows();
+                clearHighlights();
+                clearUnofficialIndicators();
+                clearGitHubBadges();
+                // Show sub-row
+                rapidsSubRow.style.display = '';  // Remove inline style
+                rapidsSubRow.classList.add('show');
+            });
+
+            // Hide sub-row when leaving RAPIDS (with delay)
+            rapidsCell.addEventListener('mouseleave', () => {
+                hoverTimeout = setTimeout(() => {
+                    if (!rapidsSubRow.matches(':hover')) {
+                        rapidsSubRow.classList.remove('show');
+                        rapidsSubRow.style.display = 'none'; // Explicitly hide
+                    }
+                }, 150);
+            });
+
+            // Keep sub-row visible when hovering over it
+            rapidsSubRow.addEventListener('mouseenter', () => {
+                clearTimeout(hoverTimeout);
+                rapidsSubRow.style.display = '';  // Remove inline style
+                rapidsSubRow.classList.add('show');
+            });
+
+            // Hide sub-row when leaving it
+            rapidsSubRow.addEventListener('mouseleave', () => {
+                hoverTimeout = setTimeout(() => {
+                    rapidsSubRow.classList.remove('show');
+                    rapidsSubRow.style.display = 'none'; // Explicitly hide
+                }, 150);
             });
         }
 
@@ -1873,6 +2137,38 @@
             'RAPIDS': {
                 repo: 'rapidsai/cudf',
                 stars: '9.1k'
+            },
+            'cuDF': {
+                repo: 'rapidsai/cudf',
+                stars: '9.1k'
+            },
+            'cuML': {
+                repo: 'rapidsai/cuml',
+                stars: '4.8k'
+            },
+            'cuGraph': {
+                repo: 'rapidsai/cugraph',
+                stars: '2k'
+            },
+            'RAFT': {
+                repo: 'rapidsai/raft',
+                stars: '913'
+            },
+            'cuSpatial': {
+                repo: 'rapidsai/cuspatial',
+                stars: '159'
+            },
+            'rmm': {
+                repo: 'rapidsai/rmm',
+                stars: '601'
+            },
+            'cuVS': {
+                repo: 'rapidsai/cuvs',
+                stars: '463'
+            },
+            'cuCIM': {
+                repo: 'rapidsai/cucim',
+                stars: '409'
             },
             'CUB': {
                 repo: 'NVIDIA/cccl',
@@ -2251,6 +2547,11 @@
             
             if (!showGitHubStars) return;
             
+            // Skip if cell already has a permanent badge
+            if (cell.querySelector('.github-star-badge:not(.temp)')) {
+                return;
+            }
+            
             const repoData = githubRepoData[libraryName];
             if (repoData) {
                 const showCCCLBadgeColor = document.getElementById('showCCCLBadgeColor').checked;
@@ -2339,11 +2640,12 @@
         // Add hover events to table cells when table is populated
         function addDependencyHoverEvents() {
             const cells = document.querySelectorAll('#tableBody td');
-            const tableBody = document.getElementById('tableBody');
+            const tableContainer = document.querySelector('.table-container');
             let currentHoverTimeout = null;
+            let currentLibrary = null; // Track currently active library
             
-            // Clear everything when mouse leaves the entire table
-            tableBody.addEventListener('mouseleave', function() {
+            // Clear everything when mouse leaves the entire table container
+            tableContainer.addEventListener('mouseleave', function() {
                 clearArrows();
                 clearHighlights();
                 clearUnofficialIndicators();
@@ -2352,26 +2654,45 @@
                     clearTimeout(currentHoverTimeout);
                     currentHoverTimeout = null;
                 }
+                currentLibrary = null;
             });
             
             cells.forEach(cell => {
                 if (cell.classList.contains('empty-cell')) return;
                 
                 cell.addEventListener('mouseenter', function(event) {
+                    // Use the stored library name from data attribute
+                    const libraryName = this.dataset.library;
+                    
+                    // Skip if this is the same library already showing
+                    if (currentLibrary === libraryName) {
+                        return;
+                    }
+                    
                     // Clear any pending timeout
                     if (currentHoverTimeout) {
                         clearTimeout(currentHoverTimeout);
                         currentHoverTimeout = null;
                     }
                     
-                    // Use the stored library name from data attribute
-                    const libraryName = this.dataset.library;
+                    // Clear existing state immediately
+                    clearArrows();
+                    clearHighlights();
+                    clearUnofficialIndicators();
+                    clearGitHubBadges();
                     
-                    if (libraryName && dependencyData[libraryName]) {
+                    // Update current library
+                    currentLibrary = libraryName;
+                    
+                    // Skip RAPIDS itself since sub-libraries handle dependencies
+                    if (libraryName && libraryName !== 'RAPIDS' && dependencyData[libraryName]) {
                         // Small delay to prevent flickering during rapid mouse movements
                         currentHoverTimeout = setTimeout(() => {
-                            showDependencies(libraryName, this);
-                        }, 50);
+                            // Double-check we're still on the same library
+                            if (currentLibrary === libraryName) {
+                                showDependencies(libraryName, this);
+                            }
+                        }, 30);
                     }
                 });
                 
@@ -2382,10 +2703,62 @@
                         currentHoverTimeout = null;
                     }
                     
-                    // Don't clear immediately - let the table mouseleave handle it
+                    // Don't clear immediately - let the table container mouseleave handle it
                     // This prevents flickering when moving between cells
                 });
             });
+            
+            // Add hover events to RAPIDS sub-libraries (in the new row)
+            setTimeout(() => {
+                const rapidsSubRow = document.getElementById('rapids-subrow');
+                if (rapidsSubRow) {
+                    const sublibraryLinks = rapidsSubRow.querySelectorAll('a[data-library]');
+                    
+                    sublibraryLinks.forEach(link => {
+                        link.addEventListener('mouseenter', function(event) {
+                            const libraryName = this.dataset.library;
+                            
+                            // Skip if this is the same library already showing
+                            if (currentLibrary === libraryName) {
+                                return;
+                            }
+                            
+                            // Clear any pending timeout
+                            if (currentHoverTimeout) {
+                                clearTimeout(currentHoverTimeout);
+                                currentHoverTimeout = null;
+                            }
+                            
+                            // Clear existing state immediately
+                            clearArrows();
+                            clearHighlights();
+                            clearUnofficialIndicators();
+                            clearGitHubBadges();
+                            
+                            // Update current library
+                            currentLibrary = libraryName;
+                            
+                            if (libraryName && dependencyData[libraryName]) {
+                                // Small delay to prevent flickering during rapid mouse movements
+                                currentHoverTimeout = setTimeout(() => {
+                                    // Double-check we're still on the same library
+                                    if (currentLibrary === libraryName) {
+                                        showDependencies(libraryName, this.parentElement);
+                                    }
+                                }, 30);
+                            }
+                        });
+                        
+                        link.addEventListener('mouseleave', function() {
+                            // Clear any pending show timeout
+                            if (currentHoverTimeout) {
+                                clearTimeout(currentHoverTimeout);
+                                currentHoverTimeout = null;
+                            }
+                        });
+                    });
+                }
+            }, 200); // Wait for RAPIDS sub-libraries to be created
         }
 
         // Modified populateTable function to include dependency events

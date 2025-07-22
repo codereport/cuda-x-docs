@@ -234,5 +234,37 @@
   "CUFILE": {
     "dependencies": ["CUDA Runtime"],
     "official": true
+  },
+  "cuDF": {
+    "dependencies": ["rmm", "libcu++", "CUDA C++", "CUDA Runtime"],
+    "official": false
+  },
+  "cuML": {
+    "dependencies": ["cuBLAS", "cuSOLVER", "cuRAND", "RAFT", "rmm", "CUDA C++", "CUDA Runtime"],
+    "official": false
+  },
+  "cuGraph": {
+    "dependencies": ["RAFT", "rmm", "CUDA C++", "CUDA Runtime"],
+    "official": false
+  },
+  "RAFT": {
+    "dependencies": ["cuBLAS", "cuSOLVER", "cuRAND", "rmm", "CUDA C++", "CUDA Runtime"],
+    "official": false
+  },
+  "cuSpatial": {
+    "dependencies": ["cuDF", "CUDA C++", "CUDA Runtime"],
+    "official": false
+  },
+  "rmm": {
+    "dependencies": ["CUDA Runtime", "CUDA C++"],
+    "official": false
+  },
+  "cuVS": {
+    "dependencies": ["RAFT", "rmm", "CUDA C++", "CUDA Runtime"],
+    "official": false
+  },
+  "cuCIM": {
+    "dependencies": ["NPP", "CUDA C++", "CUDA Runtime"],
+    "official": false
   }
 } 
