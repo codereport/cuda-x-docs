@@ -808,6 +808,80 @@
                 font-size: 0.8rem;
             }
         }
+
+        /* Dependency arrow styles */
+        .dependency-arrows {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .dependency-arrow {
+            stroke: #76b900;
+            stroke-width: 2;
+            fill: none;
+            opacity: 0.8;
+            filter: drop-shadow(0 0 3px rgba(118, 185, 0, 0.6));
+        }
+
+        .dependency-highlighted {
+            background: rgba(118, 185, 0, 0.2) !important;
+            border-color: rgba(118, 185, 0, 0.6) !important;
+            box-shadow: 0 0 10px rgba(118, 185, 0, 0.4) !important;
+            transform: scale(1.02) !important;
+        }
+
+        .dependency-source {
+            background: rgba(255, 215, 0, 0.3) !important;
+            border-color: rgba(255, 215, 0, 0.8) !important;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.6) !important;
+        }
+
+        .dependency-source-python {
+            background: rgba(255, 235, 59, 0.4) !important;
+            border-color: rgba(255, 235, 59, 0.8) !important;
+            box-shadow: 0 0 15px rgba(255, 235, 59, 0.6) !important;
+        }
+
+        .dependency-source-cpp {
+            background: rgba(33, 150, 243, 0.4) !important;
+            border-color: rgba(33, 150, 243, 0.8) !important;
+            box-shadow: 0 0 15px rgba(33, 150, 243, 0.6) !important;
+        }
+
+        .dependency-source-fortran {
+            background: rgba(156, 39, 176, 0.4) !important;
+            border-color: rgba(156, 39, 176, 0.8) !important;
+            box-shadow: 0 0 15px rgba(156, 39, 176, 0.6) !important;
+        }
+
+        /* Question mark indicator for unofficial dependencies */
+        .unofficial-indicator {
+            position: absolute;
+            bottom: 2px;
+            left: 2px;
+            font-size: 12px;
+            background: rgba(255, 165, 0, 0.9);
+            color: #000;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            z-index: 25;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .unofficial-indicator.show {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -1043,6 +1117,17 @@
                 </tbody>
             </table>
         </div>
+
+        <!-- SVG container for dependency arrows -->
+        <svg class="dependency-arrows" id="dependencyArrows">
+            <defs>
+                <!-- Universal arrowhead that auto-orients -->
+                <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+                        refX="9" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#76b900" />
+                </marker>
+            </defs>
+        </svg>
     </div>
 
     <script>
@@ -1523,6 +1608,387 @@
         });
 
         // Populate table on page load
+        populateTable();
+
+        // Dependency data - loaded from JSON file
+        let dependencyData = {};
+
+        // Load dependencies from JSON file
+        async function loadDependencies() {
+            try {
+                const response = await fetch('dependencies.json');
+                dependencyData = await response.json();
+                console.log('Dependencies loaded:', Object.keys(dependencyData).length, 'libraries');
+            } catch (error) {
+                console.error('Failed to load dependencies:', error);
+                // Fallback to empty object if file loading fails
+                dependencyData = {};
+            }
+        }
+
+        // Initialize dependencies
+        loadDependencies();
+
+        // Function to normalize library names for lookup
+        function normalizeName(name) {
+            if (!name) return '';
+            return name.toString().trim();
+        }
+
+        // Function to find a cell by library name
+        function findCellByName(libraryName) {
+            const normalizedName = normalizeName(libraryName);
+            const cells = document.querySelectorAll('#tableBody td');
+            
+            for (let cell of cells) {
+                const cellText = normalizeName(cell.textContent);
+                if (cellText === normalizedName) {
+                    return cell;
+                }
+            }
+            return null;
+        }
+
+        // Function to get direct dependencies only
+        function getDirectDependencies(libraryName) {
+            const normalizedName = normalizeName(libraryName);
+            const libData = dependencyData[normalizedName];
+            return libData ? libData.dependencies : [];
+        }
+
+        // Function to get all dependencies using BFS (organized by levels)
+        function getAllDependenciesBFS(libraryName) {
+            const normalizedName = normalizeName(libraryName);
+            const visited = new Set();
+            const levels = [];
+            let currentLevel = [normalizedName];
+            
+            while (currentLevel.length > 0) {
+                const nextLevel = [];
+                const currentLevelDeps = [];
+                
+                for (const lib of currentLevel) {
+                    if (visited.has(lib)) continue;
+                    visited.add(lib);
+                    
+                    const directDeps = getDirectDependencies(lib);
+                    for (const dep of directDeps) {
+                        if (!visited.has(dep)) {
+                            currentLevelDeps.push(dep);
+                            nextLevel.push(dep);
+                        }
+                    }
+                }
+                
+                if (currentLevelDeps.length > 0) {
+                    levels.push(currentLevelDeps);
+                }
+                
+                currentLevel = nextLevel;
+            }
+            
+            return levels;
+        }
+
+        // Function to get all dependencies flattened
+        function getAllDependencies(libraryName) {
+            const levels = getAllDependenciesBFS(libraryName);
+            return levels.flat();
+        }
+
+        // Function to check if a library is official
+        function isLibraryOfficial(libraryName) {
+            const normalizedName = normalizeName(libraryName);
+            const libData = dependencyData[normalizedName];
+            return libData ? libData.official : true; // Default to official if not found
+        }
+
+        // Function to get cell position relative to table container
+        function getCellPosition(cell) {
+            const tableContainer = document.querySelector('.table-container');
+            const tableRect = tableContainer.getBoundingClientRect();
+            const cellRect = cell.getBoundingClientRect();
+            
+            const left = cellRect.left - tableRect.left;
+            const top = cellRect.top - tableRect.top;
+            const right = cellRect.right - tableRect.left;
+            const bottom = cellRect.bottom - tableRect.top;
+            const centerX = left + cellRect.width / 2;
+            const centerY = top + cellRect.height / 2;
+            
+            return {
+                // Center points
+                x: centerX,
+                y: centerY,
+                // Edge connection points
+                top: { x: centerX, y: top },
+                bottom: { x: centerX, y: bottom },
+                left: { x: left, y: centerY },
+                right: { x: right, y: centerY },
+                // Bounds
+                width: cellRect.width,
+                height: cellRect.height,
+                bounds: { left, top, right, bottom }
+            };
+        }
+
+        // Function to get the best connection points between two cells
+        function getConnectionPoints(sourcePos, targetPos) {
+            // Always start from the bottom of the source cell
+            const startPoint = sourcePos.bottom;
+            
+            // Calculate distances from source bottom to all target sides
+            const targetConnections = [
+                { end: targetPos.top, 
+                  dist: Math.sqrt(Math.pow(startPoint.x - targetPos.top.x, 2) + Math.pow(startPoint.y - targetPos.top.y, 2)) },
+                { end: targetPos.bottom, 
+                  dist: Math.sqrt(Math.pow(startPoint.x - targetPos.bottom.x, 2) + Math.pow(startPoint.y - targetPos.bottom.y, 2)) },
+                { end: targetPos.left, 
+                  dist: Math.sqrt(Math.pow(startPoint.x - targetPos.left.x, 2) + Math.pow(startPoint.y - targetPos.left.y, 2)) },
+                { end: targetPos.right, 
+                  dist: Math.sqrt(Math.pow(startPoint.x - targetPos.right.x, 2) + Math.pow(startPoint.y - targetPos.right.y, 2)) }
+            ];
+            
+            // Find the closest target side
+            const closestTarget = targetConnections.reduce((min, conn) => conn.dist < min.dist ? conn : min);
+            
+            return { 
+                start: startPoint, 
+                end: closestTarget.end, 
+                markerType: 'arrowhead' 
+            };
+        }
+
+        // Function to create a straight arrow path
+        function createArrowPath(start, end, markerType, sourcePos, targetPos) {
+            // Simple straight line from start to end
+            return `M ${start.x} ${start.y} L ${end.x} ${end.y}`;
+        }
+
+        // Function to draw arrows between cells
+        function drawArrows(sourceCell, targetCells) {
+            const svg = document.getElementById('dependencyArrows');
+            const sourcePos = getCellPosition(sourceCell);
+            
+            targetCells.forEach((targetCell, index) => {
+                if (!targetCell || targetCell === sourceCell) return;
+                
+                const targetPos = getCellPosition(targetCell);
+                const connectionPoints = getConnectionPoints(sourcePos, targetPos);
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                
+                const pathData = createArrowPath(connectionPoints.start, connectionPoints.end, connectionPoints.markerType, sourcePos, targetPos);
+                path.setAttribute('d', pathData);
+                path.setAttribute('class', 'dependency-arrow');
+                path.setAttribute('marker-end', `url(#${connectionPoints.markerType})`);
+                
+                // Add arrow immediately
+                svg.appendChild(path);
+            });
+        }
+
+        // Function to draw arrows using BFS (level by level)
+        function drawArrowsBFS(libraryName, sourceCell) {
+            const svg = document.getElementById('dependencyArrows');
+            const levels = getAllDependenciesBFS(libraryName);
+            
+            // Keep track of all processed libraries and their cells
+            const processedLibs = new Map();
+            processedLibs.set(normalizeName(libraryName), sourceCell);
+            
+            // Process each level
+            levels.forEach((levelDeps, levelIndex) => {
+                levelDeps.forEach(depName => {
+                    const depCell = findCellByName(depName);
+                    if (!depCell) return;
+                    
+                    processedLibs.set(normalizeName(depName), depCell);
+                    
+                    // Find all libraries that depend on this one
+                    const dependents = [];
+                    for (const [libName, libCell] of processedLibs.entries()) {
+                        const directDeps = getDirectDependencies(libName);
+                        if (directDeps.includes(depName)) {
+                            dependents.push(libCell);
+                        }
+                    }
+                    
+                    // Draw arrows from all dependents to this dependency
+                    dependents.forEach(dependentCell => {
+                        if (dependentCell === depCell) return;
+                        
+                        const sourcePos = getCellPosition(dependentCell);
+                        const targetPos = getCellPosition(depCell);
+                        const connectionPoints = getConnectionPoints(sourcePos, targetPos);
+                        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        
+                        const pathData = createArrowPath(connectionPoints.start, connectionPoints.end, connectionPoints.markerType, sourcePos, targetPos);
+                        path.setAttribute('d', pathData);
+                        path.setAttribute('class', 'dependency-arrow');
+                        path.setAttribute('marker-end', `url(#${connectionPoints.markerType})`);
+                        
+                        svg.appendChild(path);
+                    });
+                });
+            });
+        }
+
+        // Function to clear all arrows
+        function clearArrows() {
+            const svg = document.getElementById('dependencyArrows');
+            const arrows = svg.querySelectorAll('.dependency-arrow');
+            arrows.forEach(arrow => arrow.remove());
+        }
+
+        // Function to clear all highlights
+        function clearHighlights() {
+            const cells = document.querySelectorAll('#tableBody td');
+            cells.forEach(cell => {
+                cell.classList.remove('dependency-highlighted', 'dependency-source', 'dependency-source-python', 'dependency-source-cpp', 'dependency-source-fortran');
+            });
+        }
+
+        // Function to clear all question mark indicators
+        function clearUnofficialIndicators() {
+            const indicators = document.querySelectorAll('.unofficial-indicator');
+            indicators.forEach(indicator => {
+                indicator.classList.remove('show');
+                setTimeout(() => {
+                    if (indicator.parentNode) {
+                        indicator.parentNode.removeChild(indicator);
+                    }
+                }, 200);
+            });
+        }
+
+        // Function to add question mark indicator to a cell
+        function addUnofficialIndicator(cell, libraryName) {
+            if (!isLibraryOfficial(libraryName)) {
+                const indicator = document.createElement('div');
+                indicator.className = 'unofficial-indicator';
+                indicator.textContent = '?';
+                indicator.title = `${libraryName} dependencies are unofficial/estimated`;
+                cell.appendChild(indicator);
+                
+                // Trigger show animation
+                setTimeout(() => {
+                    indicator.classList.add('show');
+                }, 10);
+            }
+        }
+
+        // Function to show dependencies for a library
+        function showDependencies(libraryName, sourceCell) {
+            clearArrows();
+            clearHighlights();
+            clearUnofficialIndicators();
+            
+            if (!libraryName || !dependencyData[libraryName]) {
+                return;
+            }
+            
+            // Determine source cell highlighting class based on language badge
+            let sourceClass = 'dependency-source';
+            const languageBadgeInfo = getLanguageBadge(libraryName);
+            
+            if (languageBadgeInfo) {
+                if (languageBadgeInfo.alt === 'Python') {
+                    sourceClass = 'dependency-source-python';
+                } else if (languageBadgeInfo.alt === 'C++') {
+                    sourceClass = 'dependency-source-cpp';
+                } else if (languageBadgeInfo.alt === 'Fortran') {
+                    sourceClass = 'dependency-source-fortran';
+                }
+            }
+            
+            // Highlight source cell with appropriate color
+            sourceCell.classList.add(sourceClass);
+            
+            // Add question mark indicator to source if unofficial
+            addUnofficialIndicator(sourceCell, libraryName);
+            
+            // Get ALL dependencies using BFS
+            const allDeps = getAllDependencies(libraryName);
+            const allTargetCells = [];
+            
+            // Find and highlight ALL dependency cells
+            allDeps.forEach(depName => {
+                const depCell = findCellByName(depName);
+                if (depCell) {
+                    depCell.classList.add('dependency-highlighted');
+                    allTargetCells.push(depCell);
+                    
+                    // Add question mark indicator if this dependency is unofficial
+                    addUnofficialIndicator(depCell, depName);
+                }
+            });
+            
+            // Draw arrows to ALL dependencies
+            if (allTargetCells.length > 0) {
+                drawArrowsBFS(libraryName, sourceCell);
+            }
+        }
+
+        // Add hover events to table cells when table is populated
+        function addDependencyHoverEvents() {
+            const cells = document.querySelectorAll('#tableBody td');
+            const tableBody = document.getElementById('tableBody');
+            let currentHoverTimeout = null;
+            
+            // Clear everything when mouse leaves the entire table
+            tableBody.addEventListener('mouseleave', function() {
+                clearArrows();
+                clearHighlights();
+                clearUnofficialIndicators();
+                if (currentHoverTimeout) {
+                    clearTimeout(currentHoverTimeout);
+                    currentHoverTimeout = null;
+                }
+            });
+            
+            cells.forEach(cell => {
+                if (cell.classList.contains('empty-cell')) return;
+                
+                cell.addEventListener('mouseenter', function() {
+                    // Clear any pending timeout
+                    if (currentHoverTimeout) {
+                        clearTimeout(currentHoverTimeout);
+                        currentHoverTimeout = null;
+                    }
+                    
+                    const libraryName = normalizeName(this.textContent);
+                    if (libraryName && dependencyData[libraryName]) {
+                        // Small delay to prevent flickering during rapid mouse movements
+                        currentHoverTimeout = setTimeout(() => {
+                            showDependencies(libraryName, this);
+                        }, 50);
+                    }
+                });
+                
+                cell.addEventListener('mouseleave', function() {
+                    // Clear any pending show timeout
+                    if (currentHoverTimeout) {
+                        clearTimeout(currentHoverTimeout);
+                        currentHoverTimeout = null;
+                    }
+                    
+                    // Don't clear immediately - let the table mouseleave handle it
+                    // This prevents flickering when moving between cells
+                });
+            });
+        }
+
+        // Modified populateTable function to include dependency events
+        const originalPopulateTable = populateTable;
+        populateTable = function() {
+            originalPopulateTable.call(this);
+            // Add dependency hover events after table is populated
+            setTimeout(() => {
+                addDependencyHoverEvents();
+            }, 100);
+        };
+
+        // Re-populate table to add the new events
         populateTable();
 
     </script>

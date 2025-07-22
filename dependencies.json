@@ -1,0 +1,194 @@
+{
+  "PyTorch": {
+    "dependencies": ["cuDNN", "cuBLAS", "CUDA C++", "CUDA Runtime"],
+    "official": true
+  },
+  "cuDNN": {
+    "dependencies": ["cuBLAS", "CUDA C++"],
+    "official": true
+  },
+  "cuBLAS": {
+    "dependencies": ["CUTLASS", "CUDA C++"],
+    "official": true
+  },
+  "CUTLASS": {
+    "dependencies": ["CUDA C++"],
+    "official": true
+  },
+  "CUDA C++": {
+    "dependencies": ["nvcc"],
+    "official": true
+  },
+  "nvcc": {
+    "dependencies": ["CUDA Runtime"],
+    "official": true
+  },
+  "TensorRT": {
+    "dependencies": ["cuDNN", "cuBLAS", "CUDA C++", "CUDA Runtime"],
+    "official": false
+  },
+  "JAX": {
+    "dependencies": ["cuDNN", "cuBLAS", "CUDA C++", "CUDA Runtime"],
+    "official": false
+  },
+  "Triton": {
+    "dependencies": ["CUDA C++", "CUDA Runtime"],
+    "official": false
+  },
+  "Omniverse": {
+    "dependencies": ["CUDA Runtime", "CUDA C++"],
+    "official": false
+  },
+  "Warp": {
+    "dependencies": ["CUDA C++", "CUDA Runtime"],
+    "official": false
+  },
+  "RAPIDS": {
+    "dependencies": ["cuBLAS", "cuDNN", "CUDA C++", "CUDA Runtime"],
+    "official": false
+  },
+  "CUDA-Q": {
+    "dependencies": ["CUDA C++", "CUDA Runtime"],
+    "official": false
+  },
+  "Holoscan": {
+    "dependencies": ["CUDA C++", "CUDA Runtime"],
+    "official": false
+  },
+  "BioNemo": {
+    "dependencies": ["cuDNN", "CUDA C++", "CUDA Runtime"],
+    "official": false
+  },
+  "Arial": {
+    "dependencies": ["CUDA C++", "CUDA Runtime"],
+    "official": false
+  },
+  "cuPyNumeric": {
+    "dependencies": ["cuBLAS", "cuFFT", "CUDA C++"],
+    "official": false
+  },
+  "cuDNN-python": {
+    "dependencies": ["cuDNN"],
+    "official": false
+  },
+  "cuQuantum": {
+    "dependencies": ["CUDA C++", "CUDA Runtime"],
+    "official": false
+  },
+  "CUDA-CV": {
+    "dependencies": ["NPP", "CUDA C++"],
+    "official": false
+  },
+  "nvComp": {
+    "dependencies": ["CUDA C++", "CUDA Runtime"],
+    "official": false
+  },
+  "CuPy": {
+    "dependencies": ["cuBLAS", "cuFFT", "cuDNN", "CUDA C++", "CUDA Runtime"],
+    "official": false
+  },
+  "cuda.parallel": {
+    "dependencies": ["CUDA C++", "CUDA Runtime"],
+    "official": false
+  },
+  "nvmath-python": {
+    "dependencies": ["cuBLAS", "cuFFT", "CUDA C++"],
+    "official": false
+  },
+  "Thrust": {
+    "dependencies": ["CUB", "CUDA C++"],
+    "official": true
+  },
+  "cuFFT": {
+    "dependencies": ["CUDA C++"],
+    "official": true
+  },
+  "NPP": {
+    "dependencies": ["CUDA C++"],
+    "official": true
+  },
+  "mpi4py": {
+    "dependencies": ["MPI", "CUDA Runtime"],
+    "official": false
+  },
+  "nvshmem4py": {
+    "dependencies": ["NVSHMEM"],
+    "official": false
+  },
+  "NCCL": {
+    "dependencies": ["CUDA Runtime", "CUDA C++"],
+    "official": true
+  },
+  "NVSHMEM": {
+    "dependencies": ["CUDA Runtime", "CUDA C++"],
+    "official": true
+  },
+  "MPI": {
+    "dependencies": ["CUDA Runtime"],
+    "official": false
+  },
+  "UCX": {
+    "dependencies": ["CUDA Runtime"],
+    "official": false
+  },
+  "cuda.cooperative": {
+    "dependencies": ["CUDA C++"],
+    "official": false
+  },
+  "CUB": {
+    "dependencies": ["CUDA C++"],
+    "official": true
+  },
+  "cuBlasDx": {
+    "dependencies": ["CUDA C++"],
+    "official": false
+  },
+  "libcu++": {
+    "dependencies": ["CUDA C++"],
+    "official": true
+  },
+  "numba-cuda": {
+    "dependencies": ["CUDA C++", "nvcc"],
+    "official": false
+  },
+  "cuTile": {
+    "dependencies": ["CUDA C++"],
+    "official": false
+  },
+  "PTX": {
+    "dependencies": ["nvcc"],
+    "official": true
+  },
+  "OpenCL": {
+    "dependencies": ["CUDA Runtime"],
+    "official": false
+  },
+  "CUDA Fortran": {
+    "dependencies": ["nvcc"],
+    "official": true
+  },
+  "nvrtc": {
+    "dependencies": ["CUDA Runtime"],
+    "official": true
+  },
+  "nvptx": {
+    "dependencies": ["CUDA Runtime"],
+    "official": false
+  },
+  "ptxas": {
+    "dependencies": ["CUDA Runtime"],
+    "official": true
+  },
+  "cuda.bindings": {
+    "dependencies": ["CUDA Runtime"],
+    "official": false
+  },
+  "cuda.core": {
+    "dependencies": ["CUDA Runtime"],
+    "official": false
+  },
+  "Nsight Tools": {
+    "dependencies": ["CUDA Runtime"],
+    "official": true
+  }
+} 
