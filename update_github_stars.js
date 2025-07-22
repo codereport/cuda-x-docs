@@ -6,6 +6,7 @@ const https = require('https');
 // GitHub repository data to update
 const repositories = {
     'PyTorch': 'pytorch/pytorch',
+    'TensorFlow': 'tensorflow/tensorflow',
     'JAX': 'jax-ml/jax', 
     'Triton': 'triton-lang/triton',
     'RAPIDS': 'rapidsai/cudf',

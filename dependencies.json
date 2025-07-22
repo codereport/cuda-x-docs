@@ -1,7 +1,11 @@
 {
   "PyTorch": {
     "dependencies": ["cuDNN", "cuBLAS", "CUDA C++", "CUDA Runtime"],
-    "official": true
+    "official": false
+  },
+  "TensorFlow": {
+    "dependencies": ["cuDNN", "cuBLAS", "CUDA C++", "CUDA Runtime"],
+    "official": false
   },
   "cuDNN": {
     "dependencies": ["cuBLAS", "CUDA C++"],

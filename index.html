@@ -1454,15 +1454,20 @@
 
         // Non-NVIDIA additions with logo info - each library gets its own column
         const nonNvidiaData = [
-            [{name: 'PyTorch', logo: 'pytorch.png', company: 'meta.png'}, {name: 'Triton', logo: 'triton.png', company: 'openai.png'}, {name: 'JAX', logo: 'jax.png', company: 'google.png'}], // Frameworks & DSLs
-            [null, null, null], // SDKs - 3 empty columns
-            [{name: 'CuPy', logo: 'cupy.png'}, null, null], // Domain-Specific Libraries - CuPy + 2 empty
-            [null, null, null], // Accelerated Libraries - 3 empty columns
-            [null, null, null], // Communication Libraries - 3 empty columns
-            [null, null, null], // Device Libraries - 3 empty columns
-            [null, null, null], // Kernel Authoring - 3 empty columns
-            [null, null, null], // Compiler Stack - 3 empty columns
-            [null, null, null] // Host Runtimes & Tools - 3 empty columns
+            [
+                {name: 'TensorFlow', logo: 'tensorflow.png', company: 'google.png'}, 
+                {name: 'PyTorch', logo: 'pytorch.png', company: 'meta.png'}, 
+                {name: 'JAX', logo: 'jax.png', company: 'google.png'},
+                {name: 'Triton', logo: 'triton.png', company: 'openai.png'}
+            ], // Frameworks & DSLs
+            [null, null, null, null], // SDKs - 4 empty columns
+            [{name: 'CuPy', logo: 'cupy.png'}, null, null, null], // Domain-Specific Libraries - CuPy + 3 empty
+            [null, null, null, null], // Accelerated Libraries - 4 empty columns
+            [null, null, null, null], // Communication Libraries - 4 empty columns
+            [null, null, null, null], // Device Libraries - 4 empty columns
+            [null, null, null, null], // Kernel Authoring - 4 empty columns
+            [null, null, null, null], // Compiler Stack - 4 empty columns
+            [null, null, null, null] // Host Runtimes & Tools - 4 empty columns
         ];
 
         // Function to determine language badge
@@ -1726,58 +1731,63 @@
         // GitHub repository data for open source projects
                 // GitHub repository data for open source projects
                 // GitHub repository data for open source projects
+                // GitHub repository data for open source projects
         const githubRepoData = {
             'Triton': {
                 repo: 'triton-lang/triton',
                 stars: '16.2k'
             },
-            'CuPy': {
-                repo: 'cupy/cupy',
-                stars: '10.3k'
+            'CUTLASS': {
+                repo: 'NVIDIA/cutlass',
+                stars: '8.1k'
             },
             'PyTorch': {
                 repo: 'pytorch/pytorch',
                 stars: '91.7k'
             },
-            'mpi4py': {
-                repo: 'mpi4py/mpi4py',
-                stars: '866'
+            'TensorFlow': {
+                repo: 'tensorflow/tensorflow',
+                stars: '190.8k'
             },
             'Thrust': {
                 repo: 'NVIDIA/thrust',
                 stars: '5.0k'
             },
+            'mpi4py': {
+                repo: 'mpi4py/mpi4py',
+                stars: '866'
+            },
             'RAPIDS': {
                 repo: 'rapidsai/cudf',
                 stars: '9.1k'
             },
-            'CUTLASS': {
-                repo: 'NVIDIA/cutlass',
-                stars: '8.1k'
-            },
-            'JAX': {
-                repo: 'jax-ml/jax',
-                stars: '32.9k'
-            },
-            'numba-cuda': {
-                repo: 'numba/numba',
-                stars: '10.5k'
+            'CUB': {
+                repo: 'NVIDIA/cub',
+                stars: '1.8k'
             },
             'libcu++': {
                 repo: 'NVIDIA/libcudacxx',
                 stars: '2.3k'
             },
+            'CuPy': {
+                repo: 'cupy/cupy',
+                stars: '10.3k'
+            },
+            'JAX': {
+                repo: 'jax-ml/jax',
+                stars: '32.9k'
+            },
+            'NVBENCH': {
+                repo: 'NVIDIA/nvbench',
+                stars: '688'
+            },
             'NCCL': {
                 repo: 'NVIDIA/nccl',
                 stars: '3.9k'
             },
-            'NVBENCH': {
-                repo: 'NVIDIA/nvbench',
-                stars: '687'
-            },
-            'CUB': {
-                repo: 'NVIDIA/cub',
-                stars: '1.8k'
+            'numba-cuda': {
+                repo: 'numba/numba',
+                stars: '10.5k'
             },
             'nvComp': {
                 repo: 'NVIDIA/nvcomp',
