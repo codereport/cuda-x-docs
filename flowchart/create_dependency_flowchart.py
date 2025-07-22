@@ -8,7 +8,7 @@ import graphviz
 from pathlib import Path
 
 
-def load_dependencies(json_file="dependencies.json"):
+def load_dependencies(json_file="../dependencies.json"):
     """Load dependencies from JSON file"""
     with open(json_file, "r") as f:
         return json.load(f)
