@@ -9,6 +9,7 @@ const repositories = {
     'TensorFlow': 'tensorflow/tensorflow',
     'JAX': 'jax-ml/jax', 
     'Triton': 'triton-lang/triton',
+    'TensorRT': 'NVIDIA/TensorRT',
     'RAPIDS': 'rapidsai/cudf',
     'CuPy': 'cupy/cupy',
     'cuPyNumeric': 'nv-legate/cupynumeric',
@@ -17,7 +18,7 @@ const repositories = {
     'CUB': 'NVIDIA/cub',
     'libcu++': 'NVIDIA/libcudacxx',
     'NCCL': 'NVIDIA/nccl',
-    'numba-cuda': 'numba/numba',
+    'numba-cuda': 'NVIDIA/numba-cuda',
     'NVBENCH': 'NVIDIA/nvbench',
     'mpi4py': 'mpi4py/mpi4py',
     'nvComp': 'NVIDIA/nvcomp'
