@@ -497,13 +497,15 @@
             max-width: 1200px;
             padding: 20px;
             position: relative;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         /* Settings Icon */
         .settings-icon {
             position: absolute;
             top: 10px;
-            left: 10px;
+            left: -45px;
             width: 30px;
             height: 30px;
             cursor: pointer;
@@ -702,10 +704,13 @@
             overflow-y: visible;
             width: 100%;
             min-width: fit-content;
+            display: flex;
+            justify-content: center;
+            margin-left: -5%;
         }
 
         .ecosystem-table {
-            width: 100%;
+            width: max-content;
             border-collapse: separate;
             border-spacing: 10px;
             background: transparent;
