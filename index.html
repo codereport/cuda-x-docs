@@ -824,12 +824,13 @@
         /* Dependency arrow styles */
         .dependency-arrows {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: -50px;
+            left: -50px;
+            width: calc(100% + 100px);
+            height: calc(100% + 100px);
             pointer-events: none;
             z-index: 10;
+            overflow: visible;
         }
 
         .dependency-arrow {
@@ -2025,10 +2026,12 @@
             const tableRect = tableContainer.getBoundingClientRect();
             const cellRect = cell.getBoundingClientRect();
             
-            const left = cellRect.left - tableRect.left;
-            const top = cellRect.top - tableRect.top;
-            const right = cellRect.right - tableRect.left;
-            const bottom = cellRect.bottom - tableRect.top;
+            // Account for SVG container offset (-50px from table container)
+            const svgOffset = 50;
+            const left = cellRect.left - tableRect.left + svgOffset;
+            const top = cellRect.top - tableRect.top + svgOffset;
+            const right = cellRect.right - tableRect.left + svgOffset;
+            const bottom = cellRect.bottom - tableRect.top + svgOffset;
             const centerX = left + cellRect.width / 2;
             const centerY = top + cellRect.height / 2;
             
