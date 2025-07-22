@@ -1,10 +1,10 @@
 {
   "PyTorch": {
-    "dependencies": ["cuDNN", "cuBLAS", "CUDA C++", "CUDA Runtime"],
+    "dependencies": ["OpenXLA", "cuDNN", "cuBLAS", "CUDA C++", "CUDA Runtime"],
     "official": false
   },
   "TensorFlow": {
-    "dependencies": ["cuDNN", "cuBLAS", "CUDA C++", "CUDA Runtime"],
+    "dependencies": ["OpenXLA", "cuDNN", "cuBLAS", "CUDA C++", "CUDA Runtime"],
     "official": false
   },
   "cuDNN": {
@@ -32,7 +32,7 @@
     "official": false
   },
   "JAX": {
-    "dependencies": ["cuDNN", "cuBLAS", "CUDA C++", "CUDA Runtime"],
+    "dependencies": ["OpenXLA", "cuDNN", "cuBLAS", "CUDA C++", "CUDA Runtime"],
     "official": false
   },
   "Triton": {
@@ -194,5 +194,9 @@
   "Nsight Tools": {
     "dependencies": ["CUDA Runtime"],
     "official": true
+  },
+  "OpenXLA": {
+    "dependencies": ["CUDA C++", "CUDA Runtime", "nvcc"],
+    "official": false
   }
 } 

@@ -1472,7 +1472,7 @@
             [null, null, null, null], // Device Libraries - 4 empty columns
             [{name: 'Triton', logo: 'triton.png', company: 'openai.png'}], // Kernel Authoring - Triton + 3 empty
             [null, null, null, null], // Kernel Authoring (continued) - 4 empty columns
-            [null, null, null, null], // Compiler Stack - 4 empty columns
+            [{name: 'OpenXLA', logo: 'xla.png', company: 'google.png'}, null, null, null], // Compiler Stack - OpenXLA + 3 empty
             [null, null, null, null] // Host Runtimes & Tools - 4 empty columns
         ];
 
@@ -1833,6 +1833,10 @@
             'nvComp': {
                 repo: 'NVIDIA/nvcomp',
                 stars: '594'
+            },
+            'OpenXLA': {
+                repo: 'openxla/xla',
+                stars: '3.4k'
             }
         };
 
@@ -1864,10 +1868,17 @@
             
             for (let cell of cells) {
                 const cellText = normalizeName(cell.textContent);
+                
                 if (cellText === normalizedName) {
                     return cell;
                 }
+                
+                // Also check dataset.library as fallback
+                if (cell.dataset.library && normalizeName(cell.dataset.library) === normalizedName) {
+                    return cell;
+                }
             }
+            
             return null;
         }
 
