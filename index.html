@@ -755,7 +755,7 @@
             border-color: rgba(118, 185, 0, 0.3);
         }
 
-        .ecosystem-table td:first-child {
+        .ecosystem-table td.category-cell {
             font-weight: 600;
             color: #76b900;
             background: rgba(118, 185, 0, 0.1);
@@ -774,7 +774,7 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
-        .ecosystem-table td:first-child:hover {
+        .ecosystem-table td.category-cell:hover {
             background: rgba(118, 185, 0, 0.2);
             color: #ffffff;
         }
@@ -1446,13 +1446,14 @@
 
         // NVIDIA-only table data
         const nvidiaTableData = [
-            ['Framworks & DSLs', 'TensorRT', 'Omniverse', 'Warp'],
+            ['Framworks', 'TensorRT', 'Omniverse'],
             ['SDKs', 'RAPIDS', 'CUDA-Q', 'Holoscan', 'BioNemo', 'Arial'],
             ['Domain-Specific Libraries', 'cuPyNumeric', 'cuDNN-python', 'cuQuantum', 'CUDA-CV', 'cuDNN', 'nvComp'],
             ['Accelerated Libraries', 'cuda.parallel', 'nvmath-python', 'Thrust', 'cuBLAS', 'cuFFT', 'NPP'],
             ['Communication Libraries', 'mpi4py', 'nvshmem4py', 'NCCL', 'NVSHMEM', 'MPI', 'UCX'],
             ['Device Libraries', 'cuda.cooperative', 'nvmath-python', 'CUB', 'cuBlasDx', 'libcu++'],
-            ['Kernel Authoring', 'numba-cuda', 'cuTile', 'CUTLASS', 'CUDA C++', 'PTX', 'OpenCL', 'CUDA Fortran'],
+            ['Kernel Authoring & DSLs', 'numba-cuda', 'cuTile', 'Warp'],
+            ['', 'CUTLASS', 'CUDA C++', 'PTX', 'OpenCL', 'CUDA Fortran'],
             ['Compiler Stack', 'nvcc', 'nvrtc', 'nvptx', 'ptxas'],
             ['Host Runtimes & Tools', 'cuda.bindings', 'cuda.core', 'CUDA Runtime', 'Nsight Tools' , 'Drivers', 'Installers']
         ];
@@ -1462,15 +1463,15 @@
             [
                 {name: 'TensorFlow', logo: 'tensorflow.png', company: 'google.png'}, 
                 {name: 'PyTorch', logo: 'pytorch.png', company: 'meta.png'}, 
-                {name: 'JAX', logo: 'jax.png', company: 'google.png'},
-                {name: 'Triton', logo: 'triton.png', company: 'openai.png'}
+                {name: 'JAX', logo: 'jax.png', company: 'google.png'}
             ], // Frameworks & DSLs
             [null, null, null, null], // SDKs - 4 empty columns
             [{name: 'CuPy', logo: 'cupy.png'}, null, null, null], // Domain-Specific Libraries - CuPy + 3 empty
             [null, null, null, null], // Accelerated Libraries - 4 empty columns
             [null, null, null, null], // Communication Libraries - 4 empty columns
             [null, null, null, null], // Device Libraries - 4 empty columns
-            [null, null, null, null], // Kernel Authoring - 4 empty columns
+            [{name: 'Triton', logo: 'triton.png', company: 'openai.png'}], // Kernel Authoring - Triton + 3 empty
+            [null, null, null, null], // Kernel Authoring (continued) - 4 empty columns
             [null, null, null, null], // Compiler Stack - 4 empty columns
             [null, null, null, null] // Host Runtimes & Tools - 4 empty columns
         ];
@@ -1550,10 +1551,39 @@
             tableData.forEach((rowData, rowIndex) => {
                 const row = document.createElement('tr');
                 
+                // Check if current row's first cell should span multiple rows
+                let rowspanCount = 1;
+                let nextRowIndex = rowIndex + 1;
+                while (nextRowIndex < tableData.length && 
+                       (!tableData[nextRowIndex][0] || tableData[nextRowIndex][0] === '')) {
+                    rowspanCount++;
+                    nextRowIndex++;
+                }
+                
+                // Track if this is a continuation row (empty first cell)
+                const isContinuationRow = !rowData[0] || rowData[0] === '';
+                
+                // Track actual DOM column position (separate from data array index)
+                let actualColumnIndex = 0;
+                
                 // Create cells for the maximum number of columns
                 for (let i = 0; i < maxCols; i++) {
+                    // Skip creating first cell if this is a continuation row (empty first cell)
+                    if (i === 0 && isContinuationRow) {
+                        continue;
+                    }
+                    
                     const cell = document.createElement('td');
                     const cellData = rowData[i];
+                    
+                    // Determine if this is the actual first column (category column)
+                    // In continuation rows, no cell should be treated as category column
+                    const isActualFirstColumn = (actualColumnIndex === 0 && !isContinuationRow);
+                    
+                    // Add rowspan to first column if it spans multiple rows
+                    if (i === 0 && rowspanCount > 1) {
+                        cell.setAttribute('rowspan', rowspanCount);
+                    }
                     
                     // Check if this is a logo object (non-NVIDIA library)
                     if (cellData && typeof cellData === 'object' && cellData.logo) {
@@ -1586,7 +1616,7 @@
                         cell.className = 'logo-cell';
                         
                         // Store normalized library name for dependency lookup
-                        if (i !== 0) {
+                        if (!isActualFirstColumn) {
                             cell.dataset.library = normalizeName(cellData.name);
                         }
                     } else {
@@ -1603,15 +1633,14 @@
                             cell.style.overflow = 'visible';
                             
                             // Store normalized library name for dependency lookup (exclude header column)
-                            if (i !== 0) {
+                            if (!isActualFirstColumn) {
                                 cell.dataset.library = normalizeName(cellContent);
                             }
                         }
                         
                         // Style the first column (category) differently
-                        if (i === 0 && cellData) {
-                            cell.style.fontWeight = '600';
-                            cell.style.color = '#76b900';
+                        if (isActualFirstColumn && cellData) {
+                            cell.classList.add('category-cell');
                         }
                     }
                     
@@ -1619,7 +1648,7 @@
                     const showLanguageBadge = document.getElementById('showLanguageBadge').checked;
                     const cellText = (cellData && typeof cellData === 'object') ? cellData.name : (cellData || '');
                     if (showLanguageBadge && cellText && cellText.toString().trim() && 
-                        !cellText.toString().includes('Nsight Tools') && i !== 0) {
+                        !cellText.toString().includes('Nsight Tools') && !isActualFirstColumn) {
                         
                         const languageBadgeInfo = getLanguageBadge(cellText);
                         if (languageBadgeInfo) {
@@ -1644,7 +1673,7 @@
                     const showGitHubStarsCheckbox = document.getElementById('showGitHubStars');
                     const showGitHubStars = showGitHubStarsCheckbox ? showGitHubStarsCheckbox.checked : true; // Default to true
                     
-                    if (showGitHubStars && cellText && cellText.toString().trim() && i !== 0) {
+                    if (showGitHubStars && cellText && cellText.toString().trim() && !isActualFirstColumn) {
                         const repoData = githubRepoData[cellText];
                         if (repoData) {
                             const badge = document.createElement('a');
@@ -1668,6 +1697,9 @@
                     }
                     
                     row.appendChild(cell);
+                    
+                    // Increment actual column index since we created a cell
+                    actualColumnIndex++;
                 }
                 
                 tableBody.appendChild(row);
