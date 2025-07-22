@@ -31,7 +31,9 @@ const repositories = {
     'cuda.cooperative': 'NVIDIA/cccl',
     'Thrust': 'NVIDIA/cccl',
     'CUB': 'NVIDIA/cccl',
-    'libcu++': 'NVIDIA/cccl'
+    'libcu++': 'NVIDIA/cccl',
+    'OpenXLA': 'OpenXLA/xla',
+    'TVM': 'apache/tvm'
 };
 
 // Function to format star count (e.g., 84532 -> 84.5k)
