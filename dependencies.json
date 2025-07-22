@@ -1,6 +1,6 @@
 {
   "PyTorch": {
-    "dependencies": ["OpenXLA", "cuDNN", "cuBLAS", "CUDA C++", "CUDA Runtime"],
+    "dependencies": ["cuDNN", "cuBLAS", "cuFFT", "cuRAND", "cuSOLVER", "cuSPARSE", "cuSPARSELt", "NCCL", "NVSHMEM", "NVTX", "nvJitLink", "cuFILE", "OpenXLA", "CUDA C++", "CUDA Runtime"],
     "official": false
   },
   "TensorFlow": {
@@ -32,7 +32,7 @@
     "official": false
   },
   "JAX": {
-    "dependencies": ["OpenXLA", "cuDNN", "cuBLAS", "CUDA C++", "CUDA Runtime"],
+    "dependencies": ["OpenXLA", "cuDNN", "cuBLAS", "cuSOLVER", "cuSPARSE", "cuFFT", "NCCL", "nvJitLink", "NVSHMEM", "CUPTI", "Triton", "CUDA C++", "CUDA Runtime"],
     "official": false
   },
   "Triton": {
@@ -196,7 +196,43 @@
     "official": true
   },
   "OpenXLA": {
-    "dependencies": ["CUDA C++", "CUDA Runtime", "nvcc"],
+    "dependencies": ["cuBLAS", "cuDNN", "nvJitLink", "NCCL", "NVSHMEM", "Triton", "CUDA C++", "CUDA Runtime"],
     "official": false
+  },
+  "TVM": {
+    "dependencies": ["cuBLAS", "cuDNN", "NVTX", "Thrust", "cuRAND", "NCCL", "NVSHMEM"],
+    "official": false
+  },
+  "cuRAND": {
+    "dependencies": ["CUDA C++"],
+    "official": true
+  },
+  "NVTX": {
+    "dependencies": ["CUDA Runtime"],
+    "official": true
+  },
+  "nvJitLink": {
+    "dependencies": ["CUDA Runtime"],
+    "official": true
+  },
+  "CUPTI": {
+    "dependencies": ["CUDA Runtime"],
+    "official": true
+  },
+  "cuSOLVER": {
+    "dependencies": ["CUDA C++"],
+    "official": true
+  },
+  "cuSPARSE": {
+    "dependencies": ["CUDA C++"],
+    "official": true
+  },
+  "cuSPARSELt": {
+    "dependencies": ["CUDA C++"],
+    "official": true
+  },
+  "CUFILE": {
+    "dependencies": ["CUDA Runtime"],
+    "official": true
   }
 } 
