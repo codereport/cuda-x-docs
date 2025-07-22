@@ -535,7 +535,7 @@
             position: absolute;
             top: 50px;
             left: 10px;
-            width: 250px;
+            width: 300px;
             background: rgba(0, 0, 0, 0.95);
             border: 1px solid rgba(118, 185, 0, 0.3);
             border-radius: 8px;
@@ -939,6 +939,17 @@
             font-weight: 600;
         }
 
+        /* Green CCCL badge styling */
+        .github-star-badge.cccl {
+            background: linear-gradient(135deg, #28a745, #34ce57);
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+
+        .github-star-badge.cccl:hover {
+            background: linear-gradient(135deg, #218838, #28a745);
+            transform: scale(1.05);
+        }
+
         /* GitHub repository link icon */
         .github-repo-link {
             position: fixed;
@@ -1203,6 +1214,10 @@
             <div class="settings-option">
                 <input type="checkbox" id="showGitHubStars" class="settings-checkbox" checked>
                 <label for="showGitHubStars" class="settings-label">Show GitHub stars</label>
+            </div>
+            <div class="settings-option">
+                <input type="checkbox" id="showCCCLBadgeColor" class="settings-checkbox" checked>
+                <label for="showCCCLBadgeColor" class="settings-label">Show CCCL different GH badge color</label>
             </div>
         </div>
 
@@ -1719,11 +1734,14 @@
                     if (showGitHubStars && cellText && cellText.toString().trim() && !isActualFirstColumn) {
                         const repoData = githubRepoData[cellText];
                         if (repoData) {
+                            const showCCCLBadgeColor = document.getElementById('showCCCLBadgeColor').checked;
                             const badge = document.createElement('a');
-                            badge.className = 'github-star-badge show'; // Permanent badge - no 'temp' class
+                            badge.className = (repoData.isCCCL && showCCCLBadgeColor) ? 'github-star-badge show cccl' : 'github-star-badge show'; // Add CCCL class for green styling only if checkbox is checked
                             badge.href = `https://github.com/${repoData.repo}`;
                             badge.target = '_blank';
-                            badge.title = `View ${cellText} on GitHub (${repoData.stars} stars)`;
+                            badge.title = repoData.isCCCL ? 
+                                `View ${cellText} on GitHub (part of CUDA C++ Core Libraries - ${repoData.stars} stars)` :
+                                `View ${cellText} on GitHub (${repoData.stars} stars)`;
                             
                             const starIcon = document.createElement('span');
                             starIcon.className = 'star-icon';
@@ -1755,6 +1773,7 @@
         const includeNonNvidiaCheckbox = document.getElementById('includeNonNvidia');
         const showLanguageBadgeCheckbox = document.getElementById('showLanguageBadge');
         const showGitHubStarsCheckbox = document.getElementById('showGitHubStars');
+        const showCCCLBadgeColorCheckbox = document.getElementById('showCCCLBadgeColor');
 
         // Toggle settings panel
         settingsIcon.addEventListener('click', (e) => {
@@ -1789,6 +1808,17 @@
             populateTable();
         });
 
+        showCCCLBadgeColorCheckbox.addEventListener('change', () => {
+            // Clear any existing arrows and badges from dependency view
+            clearArrows();
+            clearHighlights();
+            clearUnofficialIndicators();
+            clearAllGitHubBadges(); // Clear all badges before re-populating
+            
+            // Re-populate the table to update CCCL badge colors
+            populateTable();
+        });
+
         // Dependency data - loaded from JSON file
         let dependencyData = {};
 
@@ -1809,9 +1839,6 @@
         loadDependencies();
 
         // GitHub repository data for open source projects
-                // GitHub repository data for open source projects
-                // GitHub repository data for open source projects
-                // GitHub repository data for open source projects
         const githubRepoData = {
             'Triton': {
                 repo: 'triton-lang/triton',
@@ -1830,8 +1857,9 @@
                 stars: '190.8k'
             },
             'Thrust': {
-                repo: 'NVIDIA/thrust',
-                stars: '5.0k'
+                repo: 'NVIDIA/cccl',
+                stars: '1.8k',
+                isCCCL: true
             },
             'mpi4py': {
                 repo: 'mpi4py/mpi4py',
@@ -1842,12 +1870,24 @@
                 stars: '9.1k'
             },
             'CUB': {
-                repo: 'NVIDIA/cub',
-                stars: '1.8k'
+                repo: 'NVIDIA/cccl',
+                stars: '1.8k',
+                isCCCL: true
             },
             'libcu++': {
-                repo: 'NVIDIA/libcudacxx',
-                stars: '2.3k'
+                repo: 'NVIDIA/cccl',
+                stars: '1.8k',
+                isCCCL: true
+            },
+            'cuda.parallel': {
+                repo: 'NVIDIA/cccl',
+                stars: '1.8k',
+                isCCCL: true
+            },
+            'cuda.cooperative': {
+                repo: 'NVIDIA/cccl',
+                stars: '1.8k',
+                isCCCL: true
             },
             'CuPy': {
                 repo: 'cupy/cupy',
@@ -2198,11 +2238,14 @@
             
             const repoData = githubRepoData[libraryName];
             if (repoData) {
+                const showCCCLBadgeColor = document.getElementById('showCCCLBadgeColor').checked;
                 const badge = document.createElement('a');
-                badge.className = 'github-star-badge temp'; // Mark as temporary
+                badge.className = (repoData.isCCCL && showCCCLBadgeColor) ? 'github-star-badge temp cccl' : 'github-star-badge temp'; // Mark as temporary and add CCCL class only if checkbox is checked
                 badge.href = `https://github.com/${repoData.repo}`;
                 badge.target = '_blank';
-                badge.title = `View ${libraryName} on GitHub (${repoData.stars} stars)`;
+                badge.title = repoData.isCCCL ? 
+                    `View ${libraryName} on GitHub (part of CUDA C++ Core Libraries - ${repoData.stars} stars)` :
+                    `View ${libraryName} on GitHub (${repoData.stars} stars)`;
                 
                 const starIcon = document.createElement('span');
                 starIcon.className = 'star-icon';
