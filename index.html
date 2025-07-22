@@ -457,7 +457,8 @@
         }
 
         /* RAPIDS cell highlighting */
-        .rapids-cell:hover {
+        .rapids-cell:hover,
+        .rapids-cell.rapids-connected {
             background: rgba(123, 44, 191, 0.3) !important;
             border-color: rgba(123, 44, 191, 0.8) !important;
             box-shadow: 0 5px 15px rgba(123, 44, 191, 0.4) !important;
@@ -2010,6 +2011,8 @@
             rapidsCell.addEventListener('mouseleave', () => {
                 hoverTimeout = setTimeout(() => {
                     if (!rapidsSubRow.matches(':hover')) {
+                        // Clear RAPIDS connection highlighting
+                        rapidsCell.classList.remove('rapids-connected');
                         rapidsSubRow.classList.remove('show');
                         rapidsSubRow.style.display = 'none'; // Explicitly hide
                     }
@@ -2026,6 +2029,11 @@
             // Hide sub-row when leaving it
             rapidsSubRow.addEventListener('mouseleave', () => {
                 hoverTimeout = setTimeout(() => {
+                    // Clear RAPIDS connection highlighting
+                    const rapidsCell = document.querySelector('.rapids-cell');
+                    if (rapidsCell) {
+                        rapidsCell.classList.remove('rapids-connected');
+                    }
                     rapidsSubRow.classList.remove('show');
                     rapidsSubRow.style.display = 'none'; // Explicitly hide
                 }, 150);
@@ -2627,6 +2635,11 @@
                 clearHighlights();
                 clearUnofficialIndicators();
                 clearGitHubBadges();
+                // Clear RAPIDS connection highlighting
+                const rapidsCell = document.querySelector('.rapids-cell');
+                if (rapidsCell) {
+                    rapidsCell.classList.remove('rapids-connected');
+                }
                 if (currentHoverTimeout) {
                     clearTimeout(currentHoverTimeout);
                     currentHoverTimeout = null;
@@ -2711,6 +2724,12 @@
                             clearHighlights();
                             clearUnofficialIndicators();
                             clearGitHubBadges();
+                            
+                            // Highlight main RAPIDS cell when hovering over sub-library
+                            const rapidsCell = document.querySelector('.rapids-cell');
+                            if (rapidsCell) {
+                                rapidsCell.classList.add('rapids-connected');
+                            }
                             
                             // Update current library
                             currentLibrary = libraryName;
