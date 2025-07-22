@@ -11,6 +11,7 @@ const repositories = {
     'Triton': 'triton-lang/triton',
     'RAPIDS': 'rapidsai/cudf',
     'CuPy': 'cupy/cupy',
+    'cuPyNumeric': 'nv-legate/cupynumeric',
     'CUTLASS': 'NVIDIA/cutlass',
     'Thrust': 'NVIDIA/thrust',
     'CUB': 'NVIDIA/cub',
