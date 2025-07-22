@@ -22,14 +22,16 @@ const repositories = {
     'CuPy': 'cupy/cupy',
     'cuPyNumeric': 'nv-legate/cupynumeric',
     'CUTLASS': 'NVIDIA/cutlass',
-    'Thrust': 'NVIDIA/thrust',
-    'CUB': 'NVIDIA/cub',
-    'libcu++': 'NVIDIA/libcudacxx',
     'NCCL': 'NVIDIA/nccl',
     'numba-cuda': 'NVIDIA/numba-cuda',
     'NVBENCH': 'NVIDIA/nvbench',
     'mpi4py': 'mpi4py/mpi4py',
-    'nvComp': 'NVIDIA/nvcomp'
+    'nvComp': 'NVIDIA/nvcomp',
+    'cuda.parallel': 'NVIDIA/cccl',
+    'cuda.cooperative': 'NVIDIA/cccl',
+    'Thrust': 'NVIDIA/cccl',
+    'CUB': 'NVIDIA/cccl',
+    'libcu++': 'NVIDIA/cccl'
 };
 
 // Function to format star count (e.g., 84532 -> 84.5k)
@@ -120,10 +122,21 @@ function updateHtmlFile(starData) {
     let newGitHubData = '        // GitHub repository data for open source projects\n';
     newGitHubData += '        const githubRepoData = {\n';
     
+    // List of libraries that are part of CCCL
+    const ccclLibraries = ['cuda.parallel', 'cuda.cooperative', 'Thrust', 'CUB', 'libcu++'];
+    
     for (const [library, data] of Object.entries(starData)) {
         newGitHubData += `            '${library}': {\n`;
         newGitHubData += `                repo: '${data.repo}',\n`;
-        newGitHubData += `                stars: '${data.formatted}'\n`;
+        newGitHubData += `                stars: '${data.formatted}'`;
+        
+        // Add isCCCL flag for CCCL libraries
+        if (ccclLibraries.includes(library)) {
+            newGitHubData += `,\n                isCCCL: true\n`;
+        } else {
+            newGitHubData += `\n`;
+        }
+        
         newGitHubData += `            },\n`;
     }
     
