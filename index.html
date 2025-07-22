@@ -882,6 +882,50 @@
         .unofficial-indicator.show {
             opacity: 1;
         }
+
+        /* GitHub star badge for open source projects */
+        .github-star-badge {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            font-size: 10px;
+            background: linear-gradient(135deg, #24292e, #586069);
+            color: #ffffff;
+            border-radius: 12px;
+            padding: 2px 6px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            z-index: 25;
+            opacity: 0;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+
+        }
+
+        .github-star-badge:hover {
+            background: linear-gradient(135deg, #0366d6, #2188ff);
+            transform: scale(1.05);
+            text-decoration: none;
+            color: #ffffff;
+        }
+
+        .github-star-badge.show {
+            opacity: 1;
+        }
+
+        .github-star-badge .star-icon {
+            font-size: 9px;
+            color: #ffd700;
+        }
+
+        .github-star-badge .star-count {
+            font-size: 9px;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -1107,6 +1151,10 @@
             <div class="settings-option">
                 <input type="checkbox" id="showLanguageBadge" class="settings-checkbox">
                 <label for="showLanguageBadge" class="settings-label">Show language badge</label>
+            </div>
+            <div class="settings-option">
+                <input type="checkbox" id="showGitHubStars" class="settings-checkbox" checked>
+                <label for="showGitHubStars" class="settings-label">Show GitHub stars</label>
             </div>
         </div>
 
@@ -1526,6 +1574,11 @@
                         }
                         
                         cell.className = 'logo-cell';
+                        
+                        // Store normalized library name for dependency lookup
+                        if (i !== 0) {
+                            cell.dataset.library = normalizeName(cellData.name);
+                        }
                     } else {
                         // Regular text cell
                         const cellContent = cellData || '';
@@ -1538,6 +1591,11 @@
                             // Add position relative for badge positioning (non-empty cells)
                             cell.style.position = 'relative';
                             cell.style.overflow = 'visible';
+                            
+                            // Store normalized library name for dependency lookup (exclude header column)
+                            if (i !== 0) {
+                                cell.dataset.library = normalizeName(cellContent);
+                            }
                         }
                         
                         // Style the first column (category) differently
@@ -1571,6 +1629,33 @@
                             }
                         }
                     }
+
+                    // Add GitHub star badge to all open source projects when checkbox is checked
+                    const showGitHubStarsCheckbox = document.getElementById('showGitHubStars');
+                    const showGitHubStars = showGitHubStarsCheckbox ? showGitHubStarsCheckbox.checked : true; // Default to true
+                    
+                    if (showGitHubStars && cellText && cellText.toString().trim() && i !== 0) {
+                        const repoData = githubRepoData[cellText];
+                        if (repoData) {
+                            const badge = document.createElement('a');
+                            badge.className = 'github-star-badge show'; // Permanent badge - no 'temp' class
+                            badge.href = `https://github.com/${repoData.repo}`;
+                            badge.target = '_blank';
+                            badge.title = `View ${cellText} on GitHub (${repoData.stars} stars)`;
+                            
+                            const starIcon = document.createElement('span');
+                            starIcon.className = 'star-icon';
+                            starIcon.textContent = '★';
+                            
+                            const starCount = document.createElement('span');
+                            starCount.className = 'star-count';
+                            starCount.textContent = repoData.stars;
+                            
+                            badge.appendChild(starIcon);
+                            badge.appendChild(starCount);
+                            cell.appendChild(badge);
+                        }
+                    }
                     
                     row.appendChild(cell);
                 }
@@ -1584,6 +1669,7 @@
         const settingsPanel = document.getElementById('settingsPanel');
         const includeNonNvidiaCheckbox = document.getElementById('includeNonNvidia');
         const showLanguageBadgeCheckbox = document.getElementById('showLanguageBadge');
+        const showGitHubStarsCheckbox = document.getElementById('showGitHubStars');
 
         // Toggle settings panel
         settingsIcon.addEventListener('click', (e) => {
@@ -1607,8 +1693,16 @@
             populateTable();
         });
 
-        // Populate table on page load
-        populateTable();
+        showGitHubStarsCheckbox.addEventListener('change', () => {
+            // Clear any existing arrows and badges from dependency view
+            clearArrows();
+            clearHighlights();
+            clearUnofficialIndicators();
+            clearAllGitHubBadges(); // Clear all badges before re-populating
+            
+            // Re-populate the table to show/hide GitHub stars
+            populateTable();
+        });
 
         // Dependency data - loaded from JSON file
         let dependencyData = {};
@@ -1629,10 +1723,87 @@
         // Initialize dependencies
         loadDependencies();
 
+        // GitHub repository data for open source projects
+                // GitHub repository data for open source projects
+                // GitHub repository data for open source projects
+        const githubRepoData = {
+            'Triton': {
+                repo: 'triton-lang/triton',
+                stars: '16.2k'
+            },
+            'CuPy': {
+                repo: 'cupy/cupy',
+                stars: '10.3k'
+            },
+            'PyTorch': {
+                repo: 'pytorch/pytorch',
+                stars: '91.7k'
+            },
+            'mpi4py': {
+                repo: 'mpi4py/mpi4py',
+                stars: '866'
+            },
+            'Thrust': {
+                repo: 'NVIDIA/thrust',
+                stars: '5.0k'
+            },
+            'RAPIDS': {
+                repo: 'rapidsai/cudf',
+                stars: '9.1k'
+            },
+            'CUTLASS': {
+                repo: 'NVIDIA/cutlass',
+                stars: '8.1k'
+            },
+            'JAX': {
+                repo: 'jax-ml/jax',
+                stars: '32.9k'
+            },
+            'numba-cuda': {
+                repo: 'numba/numba',
+                stars: '10.5k'
+            },
+            'libcu++': {
+                repo: 'NVIDIA/libcudacxx',
+                stars: '2.3k'
+            },
+            'NCCL': {
+                repo: 'NVIDIA/nccl',
+                stars: '3.9k'
+            },
+            'NVBENCH': {
+                repo: 'NVIDIA/nvbench',
+                stars: '687'
+            },
+            'CUB': {
+                repo: 'NVIDIA/cub',
+                stars: '1.8k'
+            },
+            'nvComp': {
+                repo: 'NVIDIA/nvcomp',
+                stars: '594'
+            }
+        };
+
         // Function to normalize library names for lookup
         function normalizeName(name) {
             if (!name) return '';
-            return name.toString().trim();
+            let normalized = name.toString().trim();
+            
+            // Handle specific naming mismatches between table data and dependency keys
+            const nameMap = {
+                'OpenAI Triton': 'Triton',
+                'cuBlas': 'cuBLAS',
+                'libcu++': 'libcu++',
+                'cuTensor': 'cuTENSOR',
+                'CUDA MATH': 'CUDA Math',
+                'cuda.core': 'cuda.core',
+                'cuda.bindings': 'cuda.bindings',
+                'cuda.parallel': 'cuda.parallel',
+                'cuda.cooperative': 'cuda.cooperative'
+            };
+            
+            return nameMap[normalized] || normalized;
         }
 
         // Function to find a cell by library name
@@ -1790,46 +1961,57 @@
         // Function to draw arrows using BFS (level by level)
         function drawArrowsBFS(libraryName, sourceCell) {
             const svg = document.getElementById('dependencyArrows');
-            const levels = getAllDependenciesBFS(libraryName);
             
-            // Keep track of all processed libraries and their cells
-            const processedLibs = new Map();
-            processedLibs.set(normalizeName(libraryName), sourceCell);
+            // Collect all dependency relationships first
+            const relationships = [];
+            const visited = new Set();
+            const queue = [libraryName];
+            const cellMap = new Map();
+            cellMap.set(normalizeName(libraryName), sourceCell);
             
-            // Process each level
-            levels.forEach((levelDeps, levelIndex) => {
-                levelDeps.forEach(depName => {
+            while (queue.length > 0) {
+                const currentLib = queue.shift();
+                const normalizedCurrent = normalizeName(currentLib);
+                
+                if (visited.has(normalizedCurrent)) continue;
+                visited.add(normalizedCurrent);
+                
+                const directDeps = getDirectDependencies(currentLib);
+                
+                directDeps.forEach(depName => {
                     const depCell = findCellByName(depName);
                     if (!depCell) return;
                     
-                    processedLibs.set(normalizeName(depName), depCell);
+                    cellMap.set(normalizeName(depName), depCell);
                     
-                    // Find all libraries that depend on this one
-                    const dependents = [];
-                    for (const [libName, libCell] of processedLibs.entries()) {
-                        const directDeps = getDirectDependencies(libName);
-                        if (directDeps.includes(depName)) {
-                            dependents.push(libCell);
-                        }
-                    }
-                    
-                    // Draw arrows from all dependents to this dependency
-                    dependents.forEach(dependentCell => {
-                        if (dependentCell === depCell) return;
-                        
-                        const sourcePos = getCellPosition(dependentCell);
-                        const targetPos = getCellPosition(depCell);
-                        const connectionPoints = getConnectionPoints(sourcePos, targetPos);
-                        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                        
-                        const pathData = createArrowPath(connectionPoints.start, connectionPoints.end, connectionPoints.markerType, sourcePos, targetPos);
-                        path.setAttribute('d', pathData);
-                        path.setAttribute('class', 'dependency-arrow');
-                        path.setAttribute('marker-end', `url(#${connectionPoints.markerType})`);
-                        
-                        svg.appendChild(path);
+                    // Record this relationship for arrow drawing
+                    relationships.push({
+                        from: cellMap.get(normalizedCurrent),
+                        to: depCell,
+                        fromName: currentLib,
+                        toName: depName
                     });
+                    
+                    // Add to queue for further processing
+                    queue.push(depName);
                 });
+            }
+            
+            // Draw all arrows
+            relationships.forEach(rel => {
+                if (!rel.from || !rel.to || rel.from === rel.to) return;
+                
+                const sourcePos = getCellPosition(rel.from);
+                const targetPos = getCellPosition(rel.to);
+                const connectionPoints = getConnectionPoints(sourcePos, targetPos);
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                
+                const pathData = createArrowPath(connectionPoints.start, connectionPoints.end, connectionPoints.markerType, sourcePos, targetPos);
+                path.setAttribute('d', pathData);
+                path.setAttribute('class', 'dependency-arrow');
+                path.setAttribute('marker-end', `url(#${connectionPoints.markerType})`);
+                
+                svg.appendChild(path);
             });
         }
 
@@ -1877,11 +2059,71 @@
             }
         }
 
+        // Function to clear GitHub star badges (only temporary ones from dependency hover)
+        function clearGitHubBadges() {
+            const badges = document.querySelectorAll('.github-star-badge.temp');
+            badges.forEach(badge => {
+                badge.classList.remove('show');
+                setTimeout(() => {
+                    if (badge.parentNode) {
+                        badge.parentNode.removeChild(badge);
+                    }
+                }, 200);
+            });
+        }
+
+        // Function to clear ALL GitHub star badges (including permanent ones)
+        function clearAllGitHubBadges() {
+            const badges = document.querySelectorAll('.github-star-badge');
+            badges.forEach(badge => {
+                badge.classList.remove('show');
+                setTimeout(() => {
+                    if (badge.parentNode) {
+                        badge.parentNode.removeChild(badge);
+                    }
+                }, 200);
+            });
+        }
+
+        // Function to add GitHub star badge to a cell (temporary, for dependency hover)
+        function addGitHubBadge(cell, libraryName) {
+            const showGitHubStars = document.getElementById('showGitHubStars').checked;
+            
+            if (!showGitHubStars) return;
+            
+            const repoData = githubRepoData[libraryName];
+            if (repoData) {
+                const badge = document.createElement('a');
+                badge.className = 'github-star-badge temp'; // Mark as temporary
+                badge.href = `https://github.com/${repoData.repo}`;
+                badge.target = '_blank';
+                badge.title = `View ${libraryName} on GitHub (${repoData.stars} stars)`;
+                
+                const starIcon = document.createElement('span');
+                starIcon.className = 'star-icon';
+                starIcon.textContent = '★';
+                
+                const starCount = document.createElement('span');
+                starCount.className = 'star-count';
+                starCount.textContent = repoData.stars;
+                
+                badge.appendChild(starIcon);
+                badge.appendChild(starCount);
+                cell.appendChild(badge);
+                
+                // Trigger show animation
+                setTimeout(() => {
+                    badge.classList.add('show');
+                }, 10);
+            }
+        }
+
         // Function to show dependencies for a library
         function showDependencies(libraryName, sourceCell) {
             clearArrows();
             clearHighlights();
             clearUnofficialIndicators();
+            clearGitHubBadges();
             
             if (!libraryName || !dependencyData[libraryName]) {
                 return;
@@ -1904,8 +2146,9 @@
             // Highlight source cell with appropriate color
             sourceCell.classList.add(sourceClass);
             
-            // Add question mark indicator to source if unofficial
+            // Add indicators to source cell
             addUnofficialIndicator(sourceCell, libraryName);
+            addGitHubBadge(sourceCell, libraryName);
             
             // Get ALL dependencies using BFS
             const allDeps = getAllDependencies(libraryName);
@@ -1918,8 +2161,9 @@
                     depCell.classList.add('dependency-highlighted');
                     allTargetCells.push(depCell);
                     
-                    // Add question mark indicator if this dependency is unofficial
+                    // Add indicators to dependency cells
                     addUnofficialIndicator(depCell, depName);
+                    addGitHubBadge(depCell, depName);
                 }
             });
             
@@ -1940,6 +2184,7 @@
                 clearArrows();
                 clearHighlights();
                 clearUnofficialIndicators();
+                clearGitHubBadges();
                 if (currentHoverTimeout) {
                     clearTimeout(currentHoverTimeout);
                     currentHoverTimeout = null;
@@ -1949,14 +2194,16 @@
             cells.forEach(cell => {
                 if (cell.classList.contains('empty-cell')) return;
                 
-                cell.addEventListener('mouseenter', function() {
+                cell.addEventListener('mouseenter', function(event) {
                     // Clear any pending timeout
                     if (currentHoverTimeout) {
                         clearTimeout(currentHoverTimeout);
                         currentHoverTimeout = null;
                     }
                     
-                    const libraryName = normalizeName(this.textContent);
+                    // Use the stored library name from data attribute
+                    const libraryName = this.dataset.library;
+                    
                     if (libraryName && dependencyData[libraryName]) {
                         // Small delay to prevent flickering during rapid mouse movements
                         currentHoverTimeout = setTimeout(() => {
@@ -1988,7 +2235,7 @@
             }, 100);
         };
 
-        // Re-populate table to add the new events
+        // Populate table on initial page load (after all DOM elements are ready)
         populateTable();
 
     </script>
